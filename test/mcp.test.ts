@@ -69,6 +69,11 @@ describe('tools', () => {
     });
   });
 
+  it('list_servers は掲載中の全サーバーを返す', () => {
+    const { text } = toolText(call('tools/call', { name: 'list_servers', arguments: {} }));
+    expect(JSON.parse(text).map((s: { slug: string }) => s.slug)).toEqual(['portfolio', 'agentguard']);
+  });
+
   it('get_server の接続設定 URL はリクエストの origin から組み立てる', () => {
     const { text } = toolText(call('tools/call', { name: 'get_server', arguments: { slug: 'portfolio' } }));
     expect(JSON.parse(text).config.mcpServers.portfolio.url).toBe('https://example.test/mcp');

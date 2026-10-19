@@ -37,6 +37,7 @@ export function getServers(siteUrl: string): Server[] {
         'このポートフォリオサイトはリモート MCP サーバーでもあります。Claude に URL を渡すと、ここに載っているサーバーの一覧やツール定義を読めます。Streamable HTTP のステートレス構成で、読み取り専用のツールを 2 つ提供します。',
       transport: 'streamable-http',
       language: 'TypeScript',
+      repo: 'https://github.com/Kaaaaazuya/mcp-shelf',
       status: 'active',
       tools: [
         {
@@ -59,65 +60,76 @@ export function getServers(siteUrl: string): Server[] {
       ],
       config: { mcpServers: { portfolio: { type: 'http', url: mcpUrl } } },
     },
-    // 以下 2 件はダミー。自作 MCP に差し替える
     {
-      slug: 'sample-bookshelf',
-      name: 'bookshelf-mcp',
-      summary: '読書記録を検索・追加する（サンプル）',
+      slug: 'agentguard',
+      name: 'AgentGuard FS',
+      summary: 'CUE で書いたポリシーに従って、AI エージェントのローカルファイル操作を操作ごとに許可・拒否する',
       description:
-        'ローカルの SQLite に保存した読書記録を、タイトルや著者で検索したり、読了日つきで追加したりするサンプルです。',
+        'AI エージェントにローカルファイル操作（read_file、write_file、list_files、delete_file）を提供し、CUE で書いたポリシーに従って操作ごとに許可・拒否する MCP サーバーです。デフォルト拒否・拒否優先で、deny ルールは大文字小文字と Unicode 正規化の違いを無視して照合します。操作は --root のディレクトリ内に限られ、symlink はパスのどこにあっても拒否します（Linux は openat2、macOS は O_NOFOLLOW_ANY）。読み書きはサイズ上限付きの UTF-8 テキストのみです。Linux 5.6 以上または macOS 11 以上で動きます。',
       transport: 'stdio',
-      language: 'TypeScript',
+      language: 'Go',
+      repo: 'https://github.com/Kaaaaazuya/agent-guard-fs',
       status: 'experimental',
       tools: [
         {
-          name: 'search_books',
-          description: 'タイトルまたは著者名で読書記録を検索する',
+          name: 'read_file',
+          description: 'Read a UTF-8 text file that the policy allows.',
           inputSchema: {
             type: 'object',
             properties: {
-              query: { type: 'string', description: '検索語' },
-              limit: { type: 'integer', minimum: 1, maximum: 50, default: 10 },
+              path: { type: 'string', description: 'the path relative to the root, such as src/main.go' },
             },
-            required: ['query'],
+            required: ['path'],
+            additionalProperties: false,
           },
         },
         {
-          name: 'add_book',
-          description: '読書記録を 1 件追加する',
+          name: 'write_file',
+          description: 'Create or replace a UTF-8 text file that the policy allows. Parent directories are not created.',
           inputSchema: {
             type: 'object',
             properties: {
-              title: { type: 'string' },
-              author: { type: 'string' },
-              finishedAt: { type: 'string', format: 'date' },
+              path: { type: 'string', description: 'the path relative to the root, such as src/main.go' },
+              content: { type: 'string', description: 'the full UTF-8 text to store at the path' },
             },
-            required: ['title'],
+            required: ['path', 'content'],
+            additionalProperties: false,
           },
         },
-      ],
-      config: { mcpServers: { bookshelf: { command: 'npx', args: ['-y', 'bookshelf-mcp'] } } },
-    },
-    {
-      slug: 'sample-rss-digest',
-      name: 'rss-digest-mcp',
-      summary: '登録した RSS フィードの新着をまとめて返す（サンプル）',
-      description:
-        '登録済みの RSS / Atom フィードから指定期間の新着記事を集め、タイトルと URL の一覧として返すサンプルです。',
-      transport: 'stdio',
-      language: 'Python',
-      status: 'archived',
-      tools: [
         {
-          name: 'get_digest',
-          description: '指定した日数ぶんの新着記事を返す',
+          name: 'list_files',
+          description:
+            'List the direct children of a directory that the policy allows. Entries the policy hides are omitted.',
           inputSchema: {
             type: 'object',
-            properties: { days: { type: 'integer', minimum: 1, maximum: 30, default: 1 } },
+            properties: {
+              path: { type: 'string', description: 'the path relative to the root, such as src/main.go' },
+            },
+            required: ['path'],
+            additionalProperties: false,
+          },
+        },
+        {
+          name: 'delete_file',
+          description: 'Delete a regular file that the policy allows. Directories and links are not deleted.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              path: { type: 'string', description: 'the path relative to the root, such as src/main.go' },
+            },
+            required: ['path'],
+            additionalProperties: false,
           },
         },
       ],
-      config: { mcpServers: { 'rss-digest': { command: 'uvx', args: ['rss-digest-mcp'] } } },
+      config: {
+        mcpServers: {
+          agentguard: {
+            command: '/absolute/path/to/agent-guard-fs/bin/agentguard',
+            args: ['--root', '/absolute/path/to/project', '--policy', '/absolute/path/to/policy.cue'],
+          },
+        },
+      },
     },
   ];
 }
