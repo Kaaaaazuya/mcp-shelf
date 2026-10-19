@@ -3,3 +3,4 @@ dist/
 .void/
 .env
 .wrangler/
+.void-wrangler.jsonc

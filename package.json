@@ -1,0 +1,28 @@
+{
+  "name": "mcp-shelf",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "void prepare && tsc --noEmit",
+    "test": "vitest run",
+    "deploy": "void deploy"
+  },
+  "dependencies": {
+    "@void/react": "1.1.12",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "void": "1.1.12"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "hono": "4.13.13",
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  }
+}
