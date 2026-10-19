@@ -556,6 +556,9 @@ main {
     order: 3;
     flex-basis: 100%;
   }
+  .tool summary::after {
+    margin-left: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
