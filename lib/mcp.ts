@@ -1,6 +1,6 @@
 // SDK を使わない最小の MCP 実装。Streamable HTTP のステートレス構成で、毎回 JSON を 1 回返す。
 
-import { getServers, toSummary } from '../data/servers';
+import { toSummary, type Server } from './servers';
 
 export const LATEST_PROTOCOL_VERSION = '2025-06-18';
 export const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
@@ -24,8 +24,8 @@ export interface JsonRpcResponse {
 }
 
 export interface McpContext {
-  /** サイトの origin。接続設定の URL に使う */
-  siteUrl: string;
+  /** 掲載データ。呼び出し側が DB から読んで渡す（lib/servers-db.ts） */
+  servers: Server[];
 }
 
 /** HTTP に載せる前の結果。body が undefined なら本文なし（通知だけのリクエスト） */
@@ -61,7 +61,7 @@ function textResult(value: unknown, isError = false) {
 }
 
 export function listTools(ctx: McpContext) {
-  const self = getServers(ctx.siteUrl).find((s) => s.slug === 'portfolio');
+  const self = ctx.servers.find((s) => s.slug === 'portfolio');
   return { tools: self?.tools ?? [] };
 }
 
@@ -73,7 +73,7 @@ function callTool(params: unknown, ctx: McpContext) {
   if (!isObject(args)) {
     throw new RpcError(ErrorCode.InvalidParams, 'params.arguments must be an object');
   }
-  const servers = getServers(ctx.siteUrl);
+  const { servers } = ctx;
 
   switch (params.name) {
     case 'list_servers':

@@ -1,13 +1,14 @@
 import { HTTPException } from 'hono/http-exception';
 import { defineHandler, defineHead } from 'void';
 import type { InferProps } from 'void';
-import { getServers } from '../../data/servers';
+import { loadServers } from '../../lib/servers-db';
 import { siteUrlFrom } from '../../lib/site';
 
 export type Props = InferProps<typeof loader>;
 
-export const loader = defineHandler((c) => {
-  const server = getServers(siteUrlFrom(c.req.url)).find((s) => s.slug === c.req.param('slug'));
+export const loader = defineHandler(async (c) => {
+  const servers = await loadServers(siteUrlFrom(c.req.url));
+  const server = servers.find((s) => s.slug === c.req.param('slug'));
   if (!server) {
     throw new HTTPException(404, { message: 'Server not found' });
   }

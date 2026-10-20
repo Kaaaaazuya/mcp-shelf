@@ -1,15 +1,16 @@
 import { defineHandler, defineHead } from 'void';
 import type { InferProps } from 'void';
-import { getServers } from '../data/servers';
 import { handlePayload } from '../lib/mcp';
+import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
 import { INITIAL_PRESET, PRESETS } from '../lib/console-presets';
 
 export type Props = InferProps<typeof loader>;
 
-export const loader = defineHandler((c) => {
+export const loader = defineHandler(async (c) => {
   const siteUrl = siteUrlFrom(c.req.url);
-  const servers = getServers(siteUrl).map((s) => ({
+  const all = await loadServers(siteUrl);
+  const servers = all.map((s) => ({
     slug: s.slug,
     name: s.name,
     summary: s.summary,
@@ -19,7 +20,7 @@ export const loader = defineHandler((c) => {
     tools: s.tools.map((t) => t.name),
   }));
   // コンソールの初期表示。JS なしでも読めるようサーバーで tools/list を処理しておく
-  const initialResponse = handlePayload(PRESETS[INITIAL_PRESET].body, { siteUrl }).body ?? null;
+  const initialResponse = handlePayload(PRESETS[INITIAL_PRESET].body, { servers: all }).body ?? null;
   return { mcpUrl: `${siteUrl}/mcp`, servers, initialResponse };
 });
 

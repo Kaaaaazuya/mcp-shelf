@@ -2,6 +2,7 @@
 
 import { defineHandler } from 'void';
 import { handleBody } from '../lib/mcp';
+import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
 
 const CORS_HEADERS = {
@@ -16,7 +17,8 @@ function methodNotAllowed() {
 }
 
 export const POST = defineHandler(async (c) => {
-  const result = handleBody(await c.req.text(), { siteUrl: siteUrlFrom(c.req.url) });
+  const servers = await loadServers(siteUrlFrom(c.req.url));
+  const result = handleBody(await c.req.text(), { servers });
   if (result.body === undefined) {
     return new Response(null, { status: result.status, headers: CORS_HEADERS });
   }
