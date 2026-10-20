@@ -6,6 +6,7 @@
 
 - `npm run dev`: 開発サーバー（http://localhost:5173）。Void のプラグインが `@cloudflare/vite-plugin` 経由で Miniflare（workerd）を立て、ローカルの D1 に未適用のマイグレーションを流してから Worker を動かす。データは `.wrangler/` に残る
 - `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）。掲載データは Miniflare の D1 から読む
+- `npm run test:e2e`: e2e（Playwright。`e2e/`）。先に `npm run build` が要り、ブラウザが無ければ `npx playwright install chromium`。`vite preview` を立てる前にローカル D1 へマイグレーションを流し、HTTP（`/mcp`）と画面（一覧・詳細・呼び出し回数）を確かめる。呼び出し回数は D1 に残るので、増えたかどうかで見ている。ブラウザの版が合わない環境では `PLAYWRIGHT_CHROMIUM_EXECUTABLE` に Chromium のパスを渡す
 - `npm run typecheck`: 型チェック
 - `npm run lint`: oxlint（警告も失敗扱い。設定は `.oxlintrc.json`）
 - `npm run format`: oxfmt で整形する（`npm run format:check` は確認だけ。設定は `.oxfmtrc.json`）
@@ -27,6 +28,10 @@
 ## 呼び出し回数
 
 `POST /mcp` で成功した `tools/call` は、`call_counts` テーブルに日（UTC）・ツール・slug ごとに数える（`lib/usage-db.ts`、記録は `routes/mcp.ts`）。slug は `get_server` が読んだサーバーで、それ以外は空文字。トップと詳細ページは直近 30 日ぶんを `defer()` で遅れて表示する。記録や集計に失敗しても、`/mcp` の応答とページ本体には影響させない。エラーになった呼び出し（未知の slug など）と `tools/list` は数えない。
+
+## レート制限
+
+`POST /mcp` は IP 単位で 20 回 / 60 秒まで（Cloudflare の Rate Limiting バインディング `MCP_RATE_LIMITER`、超えたら 429）。上限は `void.config.ts` の `ratelimits` と `lib/rate-limit.ts` の `RATE_LIMIT` の両方にあるので、変えるときは揃える。Worker の手前で止める WAF のルールはダッシュボードで設定する。理由と手順は [docs/rate-limit.md](docs/rate-limit.md)。
 
 ## 画面を変える PR には変更前後のキャプチャを載せる
 
