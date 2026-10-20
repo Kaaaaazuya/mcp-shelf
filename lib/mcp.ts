@@ -1,6 +1,7 @@
 // SDK を使わない最小の MCP 実装。Streamable HTTP のステートレス構成で、毎回 JSON を 1 回返す。
 
-import { toSummary, type Server } from './servers';
+import { SELF_SLUG, toSummary, type Server } from './servers';
+import type { ToolCall } from './usage';
 
 export const LATEST_PROTOCOL_VERSION = '2025-06-18';
 export const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
@@ -26,6 +27,8 @@ export interface JsonRpcResponse {
 export interface McpContext {
   /** 掲載データ。呼び出し側が DB から読んで渡す（lib/servers-db.ts） */
   servers: Server[];
+  /** 成功した tools/call のたびに呼ばれる。エラーになった呼び出しは数えない */
+  onToolCall?: (call: ToolCall) => void;
 }
 
 /** HTTP に載せる前の結果。body が undefined なら本文なし（通知だけのリクエスト） */
@@ -61,7 +64,7 @@ function textResult(value: unknown, isError = false) {
 }
 
 export function listTools(ctx: McpContext) {
-  const self = ctx.servers.find((s) => s.slug === 'portfolio');
+  const self = ctx.servers.find((s) => s.slug === SELF_SLUG);
   return { tools: self?.tools ?? [] };
 }
 
@@ -77,6 +80,7 @@ function callTool(params: unknown, ctx: McpContext) {
 
   switch (params.name) {
     case 'list_servers':
+      ctx.onToolCall?.({ tool: 'list_servers', slug: '' });
       return textResult(servers.map(toSummary));
     case 'get_server': {
       if (typeof args.slug !== 'string') {
@@ -87,6 +91,7 @@ function callTool(params: unknown, ctx: McpContext) {
         const known = servers.map((s) => s.slug).join(', ');
         return textResult(`Unknown slug "${args.slug}". Call list_servers to see available slugs: ${known}`, true);
       }
+      ctx.onToolCall?.({ tool: 'get_server', slug: server.slug });
       return textResult(server);
     }
     default:

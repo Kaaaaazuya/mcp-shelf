@@ -27,6 +27,9 @@ export interface Server {
 /** 一覧表示と list_servers が返す項目 */
 export type ServerSummary = Pick<Server, 'slug' | 'name' | 'summary' | 'transport' | 'status'>;
 
+/** このサイト自身の slug。/mcp が提供するツールはこのサーバーのもの */
+export const SELF_SLUG = 'portfolio';
+
 /** config の中でこのサイトの /mcp の URL に置き換える文字列。URL はデプロイ先で変わるので DB には持たない */
 export const MCP_URL_PLACEHOLDER = '{{MCP_URL}}';
 

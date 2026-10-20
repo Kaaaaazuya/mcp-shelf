@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ErrorCode, LATEST_PROTOCOL_VERSION, handleBody, handlePayload, type JsonRpcResponse } from '../lib/mcp';
 import { siteUrlFrom } from '../lib/site';
+import type { ToolCall } from '../lib/usage';
 import { migratedServers } from './helpers/migrated-servers';
 
 const ctx = { servers: migratedServers('https://example.test') };
@@ -153,5 +154,42 @@ describe('siteUrlFrom', () => {
   it('パスとクエリを落として origin だけ返す', () => {
     expect(siteUrlFrom('https://foo.void.app/mcp?x=1')).toBe('https://foo.void.app');
     expect(siteUrlFrom('http://localhost:5173/')).toBe('http://localhost:5173');
+  });
+});
+
+describe('呼び出しの記録（onToolCall）', () => {
+  function record(messages: unknown[]) {
+    const calls: ToolCall[] = [];
+    handlePayload(messages, { ...ctx, onToolCall: (c) => calls.push(c) });
+    return calls;
+  }
+  const toolsCall = (id: number, name: string, args?: unknown) => ({
+    jsonrpc: '2.0',
+    id,
+    method: 'tools/call',
+    params: { name, arguments: args },
+  });
+
+  it('list_servers と、既知の slug の get_server を数える', () => {
+    expect(record([toolsCall(1, 'list_servers', {}), toolsCall(2, 'get_server', { slug: 'agentguard' })])).toEqual([
+      { tool: 'list_servers', slug: '' },
+      { tool: 'get_server', slug: 'agentguard' },
+    ]);
+  });
+
+  it('エラーになった呼び出しと tools/call 以外は数えない', () => {
+    expect(
+      record([
+        toolsCall(1, 'get_server', { slug: 'nope' }),
+        toolsCall(2, 'get_server', {}),
+        toolsCall(3, 'delete_everything'),
+        { jsonrpc: '2.0', id: 4, method: 'tools/list' },
+        { jsonrpc: '2.0', id: 5, method: 'ping' },
+      ]),
+    ).toEqual([]);
+  });
+
+  it('onToolCall がなくても動く', () => {
+    expect(call('tools/call', { name: 'list_servers', arguments: {} }).error).toBeUndefined();
   });
 });

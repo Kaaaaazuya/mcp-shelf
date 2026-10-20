@@ -1,9 +1,12 @@
 import { Link } from '@void/react';
 import { CopyBlock } from '../../components/CopyBlock';
+import { Loaded } from '../../components/Loaded';
 import { STATUS_LABELS, claudeAddCommand } from '../../lib/labels';
+import { SELF_SLUG } from '../../lib/servers';
+import { formatCount } from '../../lib/usage';
 import type { Props } from './[slug].server';
 
-export default function ServerDetail({ server }: Props) {
+export default function ServerDetail({ server, usage }: Props) {
   const entries = Object.entries((server.config.mcpServers ?? {}) as Record<string, Record<string, unknown>>);
   const [name, entry] = entries[0] ?? [server.slug, {}];
 
@@ -34,18 +37,32 @@ export default function ServerDetail({ server }: Props) {
           <dt>リポジトリ</dt>
           <dd>{server.repo ? <a href={server.repo}>{server.repo.replace(/^https?:\/\//, '')}</a> : 'なし'}</dd>
         </div>
+        <div>
+          <dt>参照（直近 30 日）</dt>
+          <dd className="mono">
+            <Loaded value={usage}>{(u) => formatCount(u.views)}</Loaded>
+          </dd>
+        </div>
       </dl>
 
       <div className="detail-body">
         <div className="detail-main">
           <p className="description">{server.description}</p>
           <h2>ツール</h2>
-          <p className="hint">{server.tools.length} 件。名前を押すと inputSchema を開閉します</p>
+          <p className="hint">
+            {server.tools.length} 件。名前を押すと inputSchema を開閉します
+            {server.slug === SELF_SLUG && '。右の数字は直近 30 日に呼ばれた回数です'}
+          </p>
           {server.tools.map((tool) => (
             <details key={tool.name} className="tool">
               <summary>
                 <span className="tool-name">{tool.name}</span>
                 <span className="tool-desc">{tool.description}</span>
+                {server.slug === SELF_SLUG && (
+                  <span className="tool-calls mono">
+                    <Loaded value={usage}>{(u) => formatCount(u.tools?.[tool.name] ?? 0)}</Loaded>
+                  </span>
+                )}
               </summary>
               <pre className="codeblock">{JSON.stringify(tool.inputSchema, null, 2)}</pre>
             </details>
