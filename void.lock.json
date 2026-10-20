@@ -1,8 +1,29 @@
 {
   "version": 1,
-  "source": {},
-  "resolved": {
-    "compatibility_date": "2026-02-24"
+  "source": {
+    "ratelimits": [
+      {
+        "name": "MCP_RATE_LIMITER",
+        "namespace_id": "1001",
+        "simple": {
+          "limit": 20,
+          "period": 60
+        }
+      }
+    ]
   },
-  "text": "{\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
+  "resolved": {
+    "compatibility_date": "2026-02-24",
+    "ratelimits": [
+      {
+        "name": "MCP_RATE_LIMITER",
+        "namespace_id": "1001",
+        "simple": {
+          "limit": 20,
+          "period": 60
+        }
+      }
+    ]
+  },
+  "text": "{\n  \"compatibility_date\": \"2026-02-24\",\n  \"ratelimits\": [\n    {\n      \"name\": \"MCP_RATE_LIMITER\",\n      \"namespace_id\": \"1001\",\n      \"simple\": {\n        \"limit\": 20,\n        \"period\": 60\n      }\n    }\n  ]\n}\n"
 }

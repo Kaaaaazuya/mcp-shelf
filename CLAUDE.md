@@ -28,6 +28,10 @@
 
 `POST /mcp` で成功した `tools/call` は、`call_counts` テーブルに日（UTC）・ツール・slug ごとに数える（`lib/usage-db.ts`、記録は `routes/mcp.ts`）。slug は `get_server` が読んだサーバーで、それ以外は空文字。トップと詳細ページは直近 30 日ぶんを `defer()` で遅れて表示する。記録や集計に失敗しても、`/mcp` の応答とページ本体には影響させない。エラーになった呼び出し（未知の slug など）と `tools/list` は数えない。
 
+## レート制限
+
+`POST /mcp` は IP 単位で 20 回 / 60 秒まで（Cloudflare の Rate Limiting バインディング `MCP_RATE_LIMITER`、超えたら 429）。上限は `void.config.ts` の `ratelimits` と `lib/rate-limit.ts` の `RATE_LIMIT` の両方にあるので、変えるときは揃える。Worker の手前で止める WAF のルールはダッシュボードで設定する。理由と手順は [docs/rate-limit.md](docs/rate-limit.md)。
+
 ## 画面を変える PR には変更前後のキャプチャを載せる
 
 `pages/`、`components/`、`styles/` など、見た目が変わる変更を含む PR では、PR の説明に変更前（ベースブランチ）と変更後（PR ブランチ）のスクリーンショットを並べて載せる。レビューする人がコードを動かさなくても見た目の差を確認できるようにするため。
