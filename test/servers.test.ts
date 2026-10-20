@@ -25,18 +25,28 @@ const tool = (serverSlug: string, name: string, position: number) => ({
 
 describe('toServers', () => {
   it('サーバーもツールも position の順に並べる', () => {
-    const servers = toServers([row('b', 1), row('a', 0)], [tool('a', 'y', 1), tool('a', 'x', 0), tool('b', 'z', 0)], 'https://s.test');
+    const servers = toServers(
+      [row('b', 1), row('a', 0)],
+      [tool('a', 'y', 1), tool('a', 'x', 0), tool('b', 'z', 0)],
+      'https://s.test',
+    );
     expect(servers.map((s) => s.slug)).toEqual(['a', 'b']);
     expect(servers[0].tools.map((t) => t.name)).toEqual(['x', 'y']);
     expect(servers[1].tools.map((t) => t.name)).toEqual(['z']);
   });
 
   it('config の {{MCP_URL}} をサイトの /mcp に置き換える', () => {
-    expect(toServers([row('a', 0)], [], 'https://s.test')[0].config).toEqual({ url: 'https://s.test/mcp' });
+    expect(toServers([row('a', 0)], [], 'https://s.test')[0].config).toEqual({
+      url: 'https://s.test/mcp',
+    });
   });
 
   it('repo が NULL ならキーごと省く', () => {
-    const [withRepo, without] = toServers([row('a', 0, 'https://github.com/x/a'), row('b', 1)], [], 'https://s.test');
+    const [withRepo, without] = toServers(
+      [row('a', 0, 'https://github.com/x/a'), row('b', 1)],
+      [],
+      'https://s.test',
+    );
     expect(withRepo.repo).toBe('https://github.com/x/a');
     expect('repo' in without).toBe(false);
   });

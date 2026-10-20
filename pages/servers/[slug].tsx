@@ -4,7 +4,9 @@ import { STATUS_LABELS, claudeAddCommand } from '../../lib/labels';
 import type { Props } from './[slug].server';
 
 export default function ServerDetail({ server }: Props) {
-  const entries = Object.entries((server.config.mcpServers ?? {}) as Record<string, Record<string, unknown>>);
+  const entries = Object.entries(
+    (server.config.mcpServers ?? {}) as Record<string, Record<string, unknown>>,
+  );
   const [name, entry] = entries[0] ?? [server.slug, {}];
 
   return (
@@ -32,7 +34,13 @@ export default function ServerDetail({ server }: Props) {
         </div>
         <div>
           <dt>リポジトリ</dt>
-          <dd>{server.repo ? <a href={server.repo}>{server.repo.replace(/^https?:\/\//, '')}</a> : 'なし'}</dd>
+          <dd>
+            {server.repo ? (
+              <a href={server.repo}>{server.repo.replace(/^https?:\/\//, '')}</a>
+            ) : (
+              'なし'
+            )}
+          </dd>
         </div>
       </dl>
 

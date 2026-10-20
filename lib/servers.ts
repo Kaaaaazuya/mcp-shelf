@@ -37,10 +37,11 @@ function fillMcpUrl(config: Record<string, unknown>, mcpUrl: string): Record<str
   return JSON.parse(JSON.stringify(config).replaceAll(MCP_URL_PLACEHOLDER, mcpUrl));
 }
 
+const byPosition = (a: { position: number }, b: { position: number }) => a.position - b.position;
+
 /** servers と tools の行を、position 順に並べた Server[] にまとめる */
 export function toServers(serverRows: ServerRow[], toolRows: ToolRow[], siteUrl: string): Server[] {
   const mcpUrl = `${siteUrl}/mcp`;
-  const byPosition = (a: { position: number }, b: { position: number }) => a.position - b.position;
   return [...serverRows].sort(byPosition).map((row) => ({
     slug: row.slug,
     name: row.name,

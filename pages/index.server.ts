@@ -20,7 +20,8 @@ export const loader = defineHandler(async (c) => {
     tools: s.tools.map((t) => t.name),
   }));
   // コンソールの初期表示。JS なしでも読めるようサーバーで tools/list を処理しておく
-  const initialResponse = handlePayload(PRESETS[INITIAL_PRESET].body, { servers: all }).body ?? null;
+  const initialResponse =
+    handlePayload(PRESETS[INITIAL_PRESET].body, { servers: all }).body ?? null;
   return { mcpUrl: `${siteUrl}/mcp`, servers, initialResponse };
 });
 
@@ -29,7 +30,8 @@ export const head = defineHead(() => ({
   meta: [
     {
       name: 'description',
-      content: '自作 MCP サーバーをツール定義と接続設定つきで紹介するサイト。サイト自体もリモート MCP サーバーとして動いています。',
+      content:
+        '自作 MCP サーバーをツール定義と接続設定つきで紹介するサイト。サイト自体もリモート MCP サーバーとして動いています。',
     },
   ],
 }));

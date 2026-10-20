@@ -4,16 +4,16 @@
 
 ## 何をしているか
 
-| 対策 | 場所 | 防ぐもの |
-| --- | --- | --- |
-| `ignore-scripts=true` | `.npmrc` | 依存の `preinstall` / `install` / `postinstall` が `npm install` 時に任意コードを実行すること |
-| `min-release-age=7` | `.npmrc` | 公開されたばかりの（乗っ取りで出された可能性のある）版を取り込むこと |
-| `allow-git=none` | `.npmrc` | git リポジトリを指す依存が入ること |
-| `save-exact=true` + `check:deps` | `.npmrc`, `scripts/check-deps.mjs` | `^` や `~` で知らない版に上がること、npm 公式レジストリ以外の取得元や integrity のない依存がロックファイルに入ること |
-| `devEngines.packageManager` | `package.json` | 上の設定を理解しない古い npm（11.10 未満）でインストールして、対策が黙って効かなくなること |
-| `npm ci` / `npm audit signatures` / `npm audit` | `.github/workflows/ci.yml` | ロックファイルとずれた依存、レジストリ署名の合わない tarball、既知の high 以上の脆弱性 |
-| アクションを SHA で固定、`permissions: contents: read` | `.github/workflows/ci.yml` | タグを付け替えられたアクションの実行、CI トークンの悪用 |
-| Dependabot（7 日のクールダウン付き） | `.github/dependabot.yml` | 更新が止まって既知の脆弱性が残ること |
+| 対策                                                   | 場所                               | 防ぐもの                                                                                                             |
+| ------------------------------------------------------ | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `ignore-scripts=true`                                  | `.npmrc`                           | 依存の `preinstall` / `install` / `postinstall` が `npm install` 時に任意コードを実行すること                        |
+| `min-release-age=7`                                    | `.npmrc`                           | 公開されたばかりの（乗っ取りで出された可能性のある）版を取り込むこと                                                 |
+| `allow-git=none`                                       | `.npmrc`                           | git リポジトリを指す依存が入ること                                                                                   |
+| `save-exact=true` + `check:deps`                       | `.npmrc`, `scripts/check-deps.mjs` | `^` や `~` で知らない版に上がること、npm 公式レジストリ以外の取得元や integrity のない依存がロックファイルに入ること |
+| `devEngines.packageManager`                            | `package.json`                     | 上の設定を理解しない古い npm（11.10 未満）でインストールして、対策が黙って効かなくなること                           |
+| `npm ci` / `npm audit signatures` / `npm audit`        | `.github/workflows/ci.yml`         | ロックファイルとずれた依存、レジストリ署名の合わない tarball、既知の high 以上の脆弱性                               |
+| アクションを SHA で固定、`permissions: contents: read` | `.github/workflows/ci.yml`         | タグを付け替えられたアクションの実行、CI トークンの悪用                                                              |
+| Dependabot（7 日のクールダウン付き）                   | `.github/dependabot.yml`           | 更新が止まって既知の脆弱性が残ること                                                                                 |
 
 ## 普段の使い方
 

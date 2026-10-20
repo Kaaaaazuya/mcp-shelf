@@ -24,22 +24,36 @@ export function formatResponse(json: unknown): { text: string; expanded: boolean
 
 export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
   const [active, setActive] = useState(INITIAL_PRESET);
-  const [result, setResult] = useState<Result>({ status: '200 OK', ok: true, ...formatResponse(initialResponse) });
+  const [result, setResult] = useState<Result>({
+    status: '200 OK',
+    ok: true,
+    ...formatResponse(initialResponse),
+  });
   const [pending, setPending] = useState(false);
 
   async function send(index: number) {
     setActive(index);
     setPending(true);
+    // react/purity は描画中の呼び出しを咎めるルールだが、ここはクリック時に走る send の中
+    // oxlint-disable-next-line react/purity
     const started = performance.now();
     try {
       const res = await fetch('/mcp', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
         body: JSON.stringify(PRESETS[index].body),
       });
+      // oxlint-disable-next-line react/purity
       const ms = Math.round(performance.now() - started);
       const json = await res.json();
-      setResult({ status: `${res.status} ${res.statusText || ''}`.trim() + ` · ${ms} ms`, ok: res.ok, ...formatResponse(json) });
+      setResult({
+        status: `${res.status} ${res.statusText || ''}`.trim() + ` · ${ms} ms`,
+        ok: res.ok,
+        ...formatResponse(json),
+      });
     } catch (err) {
       setResult({ status: 'エラー', ok: false, text: String(err), expanded: false });
     } finally {
@@ -55,7 +69,13 @@ export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
       </div>
       <div className="console-tabs" role="tablist" aria-label="送るリクエスト">
         {PRESETS.map((preset, i) => (
-          <button key={preset.label} type="button" role="tab" aria-selected={i === active} onClick={() => send(i)}>
+          <button
+            key={preset.label}
+            type="button"
+            role="tab"
+            aria-selected={i === active}
+            onClick={() => send(i)}
+          >
             {preset.label}
           </button>
         ))}
@@ -66,11 +86,18 @@ export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
       </div>
       <div className="console-pane">
         <div className="console-pane-head">
-          <span>{result.expanded ? 'レスポンス（content[0].text を展開して表示）' : 'レスポンス'}</span>
-          <span className={result.ok ? 'console-status' : 'console-status is-error'} aria-live="polite">
+          <span>
+            {result.expanded ? 'レスポンス（content[0].text を展開して表示）' : 'レスポンス'}
+          </span>
+          <span
+            className={result.ok ? 'console-status' : 'console-status is-error'}
+            aria-live="polite"
+          >
             {pending ? '送信中…' : result.status}
           </span>
         </div>
+        {/* レスポンス欄は高さ固定でスクロールするので、キーボードでもスクロールできるようフォーカス可能にしておく */}
+        {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
         <pre className="codeblock response" tabIndex={0}>
           {result.text}
         </pre>

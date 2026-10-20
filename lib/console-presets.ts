@@ -12,17 +12,31 @@ export const PRESETS: Preset[] = [
       jsonrpc: '2.0',
       id: 1,
       method: 'initialize',
-      params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'web-console', version: '1.0.0' } },
+      params: {
+        protocolVersion: '2025-06-18',
+        capabilities: {},
+        clientInfo: { name: 'web-console', version: '1.0.0' },
+      },
     },
   },
   { label: 'tools/list', body: { jsonrpc: '2.0', id: 2, method: 'tools/list' } },
   {
     label: 'list_servers',
-    body: { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'list_servers', arguments: {} } },
+    body: {
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: { name: 'list_servers', arguments: {} },
+    },
   },
   {
     label: 'get_server',
-    body: { jsonrpc: '2.0', id: 4, method: 'tools/call', params: { name: 'get_server', arguments: { slug: 'portfolio' } } },
+    body: {
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: { name: 'get_server', arguments: { slug: 'portfolio' } },
+    },
   },
 ];
 

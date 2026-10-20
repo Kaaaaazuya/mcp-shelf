@@ -30,4 +30,6 @@ export const POST = defineHandler(async (c) => {
 
 export const GET = defineHandler(methodNotAllowed);
 export const DELETE = defineHandler(methodNotAllowed);
-export const OPTIONS = defineHandler(() => new Response(null, { status: 204, headers: CORS_HEADERS }));
+export const OPTIONS = defineHandler(
+  () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+);
