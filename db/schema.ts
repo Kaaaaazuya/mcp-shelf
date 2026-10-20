@@ -44,15 +44,3 @@ export const callCounts = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.day, t.tool, t.slug] })],
 );
-
-/** /mcp のレート制限を超えた IP の違反回数とブロック期限。IP そのものは持たず、鍵付きハッシュで引く */
-export const ipPenalties = sqliteTable('ip_penalties', {
-  /** HMAC-SHA256(IP_HASH_SECRET, IP) の 16 進 */
-  ipHash: text('ip_hash').primaryKey(),
-  /** 連続した違反の回数。最後の違反から 24 時間空くと数え直す */
-  strikes: integer('strikes').notNull(),
-  /** ブロックが解ける時刻（Unix ミリ秒） */
-  blockedUntil: integer('blocked_until').notNull(),
-  /** 最後に違反した時刻（Unix ミリ秒） */
-  lastViolationAt: integer('last_violation_at').notNull(),
-});

@@ -51,14 +51,13 @@ describe('allowRequest', () => {
   });
 });
 
-/** メモリ上の PenaltyStore。savePenalty と同じく、ブロック中の行は書き換えない */
+/** メモリ上の PenaltyStore */
 function memoryStore() {
   const rows = new Map<string, Penalty>();
   const store: PenaltyStore = {
     load: async (ipHash) => rows.get(ipHash),
-    save: async (ipHash, penalty, now) => {
-      const prev = rows.get(ipHash);
-      if (!prev || prev.blockedUntil <= now) rows.set(ipHash, penalty);
+    save: async (ipHash, penalty) => {
+      rows.set(ipHash, penalty);
     },
   };
   return { rows, store };
@@ -88,7 +87,7 @@ describe('secondsToWait', () => {
     expect([...rows.values()][0].strikes).toBe(3);
   });
 
-  it('D1 には IP そのものではなくハッシュを保存する', async () => {
+  it('IP そのものではなくハッシュをキーに保存する', async () => {
     const { rows, store } = memoryStore();
     await secondsToWait({ limiter: limiter(false), ip, secret, store, now: t0 });
     const [key] = rows.keys();
@@ -104,13 +103,13 @@ describe('secondsToWait', () => {
     expect(rows.size).toBe(0);
   });
 
-  it('D1 が失敗してもバインディングの判断で動く', async () => {
+  it('KV が失敗してもバインディングの判断で動く', async () => {
     const broken: PenaltyStore = {
       load: async () => {
-        throw new Error('d1 down');
+        throw new Error('kv down');
       },
       save: async () => {
-        throw new Error('d1 down');
+        throw new Error('kv down');
       },
     };
     expect(

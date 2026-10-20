@@ -32,10 +32,10 @@ function isRateLimiter(value: unknown): value is RateLimiter {
   return typeof (value as RateLimiter | undefined)?.limit === 'function';
 }
 
-/** 違反回数の読み書き。本番は lib/penalty-db.ts、テストではメモリ上の実装を渡す */
+/** 違反回数の読み書き。本番は lib/penalty-kv.ts、テストではメモリ上の実装を渡す */
 export interface PenaltyStore {
   load(ipHash: string): Promise<Penalty | undefined>;
-  save(ipHash: string, penalty: Penalty, now: number): Promise<void>;
+  save(ipHash: string, penalty: Penalty): Promise<void>;
 }
 
 export interface GateOptions {
@@ -50,7 +50,7 @@ export interface GateOptions {
 /**
  * このリクエストを断るなら、待つべき秒数を返す。通すなら 0。
  * ブロック中ならバインディングに聞かずに断る。上限を超えたら違反を記録してブロックする。
- * D1 の読み書きに失敗したときは、バインディングの制限だけで判断する。
+ * KV の読み書きに失敗したときは、バインディングの制限だけで判断する。
  */
 export async function secondsToWait(options: GateOptions): Promise<number> {
   const { limiter, ip, secret, store, now } = options;
@@ -68,9 +68,7 @@ export async function secondsToWait(options: GateOptions): Promise<number> {
   if (await allowRequest(limiter, ip)) return 0;
   if (!ipHash) return RATE_LIMIT.period;
   const next = nextPenalty(penalty, now);
-  await store
-    .save(ipHash, next, now)
-    .catch((err) => console.error('failed to save ip penalty', err));
+  await store.save(ipHash, next).catch((err) => console.error('failed to save ip penalty', err));
   return Math.ceil(blockDuration(next.strikes) / 1000);
 }
 

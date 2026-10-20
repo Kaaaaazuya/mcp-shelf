@@ -31,7 +31,7 @@
 
 ## レート制限
 
-`POST /mcp` は IP 単位で 20 回 / 60 秒まで（Cloudflare の Rate Limiting バインディング `MCP_RATE_LIMITER`、超えたら 429）。上限は `void.config.ts` の `ratelimits` と `lib/rate-limit.ts` の `RATE_LIMIT` の両方にあるので、変えるときは揃える。上限を超えた IP は、違反のたびに 1 分 → 2 分 → 4 分 …（最大 24 時間）とブロックする（`lib/penalty.ts`、D1 の `ip_penalties`）。IP は保存せず、`IP_HASH_SECRET` での HMAC だけを持つ。この鍵は `env.ts` で必須なので、ローカルは `.env` に書き、本番は `npx void secret put IP_HASH_SECRET` で入れる。Worker の手前で止める WAF のルールはダッシュボードで設定する。理由と手順は [docs/rate-limit.md](docs/rate-limit.md)。
+`POST /mcp` は IP 単位で 20 回 / 60 秒まで（Cloudflare の Rate Limiting バインディング `MCP_RATE_LIMITER`、超えたら 429）。上限は `void.config.ts` の `ratelimits` と `lib/rate-limit.ts` の `RATE_LIMIT` の両方にあるので、変えるときは揃える。上限を超えた IP は、違反のたびに 1 分 → 2 分 → 4 分 …（最大 24 時間）とブロックする（`lib/penalty.ts`、保存は Workers KV で 24 時間の TTL 付き）。IP は保存せず、`IP_HASH_SECRET` での HMAC だけを持つ。この鍵は `env.ts` で必須なので、ローカルは `.env` に書き、本番は `npx void secret put IP_HASH_SECRET` で入れる。Worker の手前で止める WAF のルールはダッシュボードで設定する。理由と手順は [docs/rate-limit.md](docs/rate-limit.md)。
 
 ## 画面を変える PR には変更前後のキャプチャを載せる
 

@@ -4,7 +4,7 @@
 import { defineHandler } from 'void';
 import { env } from 'void/env';
 import { handleBody } from '../lib/mcp';
-import { loadPenalty, savePenalty } from '../lib/penalty-db';
+import { kvPenaltyStore } from '../lib/penalty-kv';
 import { secondsToWait, tooManyRequestsBody } from '../lib/rate-limit';
 import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
@@ -29,7 +29,7 @@ export const POST = defineHandler(async (c) => {
     limiter: c.env.MCP_RATE_LIMITER,
     ip: c.req.header('CF-Connecting-IP') ?? null,
     secret: env.IP_HASH_SECRET,
-    store: { load: loadPenalty, save: savePenalty },
+    store: kvPenaltyStore(c.env.KV),
     now: Date.now(),
   });
   if (wait > 0) {

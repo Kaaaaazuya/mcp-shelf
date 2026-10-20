@@ -3,6 +3,6 @@
 import { defineEnv, string } from 'void/env';
 
 export default defineEnv({
-  /** /mcp で違反した IP を D1 に残すときの HMAC の鍵。IP そのものは保存しない（lib/penalty.ts） */
+  /** /mcp で違反した IP を KV に記録するときの HMAC の鍵。IP そのものは保存しない（lib/penalty.ts） */
   IP_HASH_SECRET: string(),
 });

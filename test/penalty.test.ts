@@ -7,6 +7,7 @@ import {
   nextPenalty,
   retryAfterSeconds,
 } from '../lib/penalty';
+import { kvPenaltyStore } from '../lib/penalty-kv';
 
 const MINUTE = 60_000;
 const t0 = Date.parse('2026-10-20T00:00:00Z');
@@ -62,5 +63,30 @@ describe('hashIp', () => {
     expect(await hashIp('203.0.113.1', 'k1')).toBe(a);
     expect(await hashIp('203.0.113.1', 'k2')).not.toBe(a);
     expect(await hashIp('203.0.113.2', 'k1')).not.toBe(a);
+  });
+});
+
+describe('kvPenaltyStore', () => {
+  it('ip-penalty: のキーに JSON で入れ、24 時間の TTL を付ける', async () => {
+    const puts: { key: string; value: string; options: unknown }[] = [];
+    const namespace = {
+      get: async (key: string) => {
+        const hit = puts.find((p) => p.key === key);
+        return hit ? JSON.parse(hit.value) : null;
+      },
+      put: async (key: string, value: string, options: unknown) => {
+        puts.push({ key, value, options });
+      },
+    } as unknown as KVNamespace;
+    const store = kvPenaltyStore(namespace);
+    const penalty = { strikes: 1, blockedUntil: t0 + MINUTE, lastViolationAt: t0 };
+
+    expect(await store.load('abc')).toBeUndefined();
+    await store.save('abc', penalty);
+    expect(puts[0]).toMatchObject({
+      key: 'ip-penalty:abc',
+      options: { expirationTtl: STRIKE_RESET_MS / 1000 },
+    });
+    expect(await store.load('abc')).toEqual(penalty);
   });
 });

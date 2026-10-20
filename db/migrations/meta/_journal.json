@@ -22,13 +22,6 @@
       "when": 1792528757716,
       "tag": "20261020203917_create_call_counts",
       "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1792531020331,
-      "tag": "20261020211700_create_ip_penalties",
-      "breakpoints": true
     }
   ]
 }

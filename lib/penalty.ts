@@ -1,5 +1,5 @@
 // レート制限を超えた IP へのブロック。違反のたびにブロックを 1 分 → 2 分 → 4 分 …… と倍にして、
-// 1 つの IP が上限ぎりぎりで呼び続けて Workers の 1 日の回数を食い尽くすのを防ぐ。DB の読み書きは lib/penalty-db.ts。
+// 1 つの IP が上限ぎりぎりで呼び続けて Workers の 1 日の回数を食い尽くすのを防ぐ。読み書きは lib/penalty-kv.ts（Workers KV）。
 
 const MINUTE = 60 * 1000;
 const DAY = 24 * 60 * MINUTE;
@@ -36,7 +36,7 @@ export function nextPenalty(prev: Penalty | undefined, now: number): Penalty {
   return { strikes, blockedUntil: now + blockDuration(strikes), lastViolationAt: now };
 }
 
-/** IP を D1 に残さないための鍵付きハッシュ（HMAC-SHA256 の 16 進） */
+/** IP をそのまま残さないための鍵付きハッシュ（HMAC-SHA256 の 16 進） */
 export async function hashIp(ip: string, secret: string): Promise<string> {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
