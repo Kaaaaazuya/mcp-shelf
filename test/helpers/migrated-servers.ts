@@ -5,7 +5,7 @@
 
 import { readFileSync } from 'node:fs';
 import { drizzle } from 'drizzle-orm/d1';
-import { Miniflare } from 'miniflare';
+import { Miniflare } from 'miniflare-test';
 import * as schema from '../../db/schema';
 import { toServers, type Server } from '../../lib/servers';
 

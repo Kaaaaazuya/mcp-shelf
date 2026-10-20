@@ -21,7 +21,7 @@
 - **列を変える**: `db/schema.ts` を直して `npx void db generate` でマイグレーションを作る。
 - 接続設定の JSON に書く自サイトの URL は `{{MCP_URL}}` にしておく。読み出し時にリクエストの origin から組み立てた `/mcp` の URL に置き換わる。
 - `npm test` は `db/migrations/` を Miniflare の空の D1 に流し、`lib/servers-db.ts` と同じ Drizzle の問い合わせで掲載データを読んで確かめる（`test/helpers/migrated-servers.ts`）。データ用マイグレーションの SQL の誤りもここで気づける。
-- devDependencies の `miniflare` と `drizzle-orm` は `void` が固定している版に合わせる。ずれると workerd がもう 1 つ入る。`void` を上げたら `npm ls miniflare drizzle-orm` で確かめてそろえる。
+- テスト用の Miniflare は devDependencies の `miniflare-test`（`npm:miniflare@<版>` の別名）。`void` が入れる `miniflare` はトップに置かれたままにしておきたいので別名にしている（同じ名前で別の版を入れると、npm が `void` 側の版を解決し直し、公開から 7 日経っていない版だと `min-release-age` で止まる）。版を上げるときは `npm i -D miniflare-test@npm:miniflare@<版>`。
 - 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。
 
 ## 呼び出し回数
