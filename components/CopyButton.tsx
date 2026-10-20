@@ -1,6 +1,14 @@
 import { useState } from 'react';
 
-export function CopyButton({ text, className = 'btn-quiet', label = 'コピー' }: { text: string; className?: string; label?: string }) {
+export function CopyButton({
+  text,
+  className = 'btn-quiet',
+  label = 'コピー',
+}: {
+  text: string;
+  className?: string;
+  label?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {

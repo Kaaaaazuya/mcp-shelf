@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "react", "jsx-a11y", "vitest"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2024": true
+  },
+  "ignorePatterns": ["dist/**", ".void/**", ".wrangler/**", "db/migrations/**"],
+  "rules": {
+    // 新しい JSX ランタイムなので React を import しなくてよい
+    "react/react-in-jsx-scope": "off",
+    // スタイルシートは import するだけで効く
+    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }],
+    // toSorted は tsconfig の target (ES2022) に含まれない。sort はコピーした配列にだけ使っている
+    "unicorn/no-array-sort": "off"
+  }
+}

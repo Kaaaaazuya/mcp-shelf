@@ -60,7 +60,9 @@ function errorResponse(id: JsonRpcId, code: number, message: string): JsonRpcRes
 
 function textResult(value: unknown, isError = false) {
   const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-  return isError ? { content: [{ type: 'text', text }], isError: true } : { content: [{ type: 'text', text }] };
+  return isError
+    ? { content: [{ type: 'text', text }], isError: true }
+    : { content: [{ type: 'text', text }] };
 }
 
 export function listTools(ctx: McpContext) {
@@ -89,7 +91,10 @@ function callTool(params: unknown, ctx: McpContext) {
       const server = servers.find((s) => s.slug === args.slug);
       if (!server) {
         const known = servers.map((s) => s.slug).join(', ');
-        return textResult(`Unknown slug "${args.slug}". Call list_servers to see available slugs: ${known}`, true);
+        return textResult(
+          `Unknown slug "${args.slug}". Call list_servers to see available slugs: ${known}`,
+          true,
+        );
       }
       ctx.onToolCall?.({ tool: 'get_server', slug: server.slug });
       return textResult(server);
@@ -135,7 +140,11 @@ export function handleMessage(message: unknown, ctx: McpContext): JsonRpcRespons
   if (typeof message.method !== 'string') {
     // method のない result / error はクライアントからの応答。返すものはない
     if (hasId && ('result' in message || 'error' in message)) return undefined;
-    return errorResponse(hasId && isValidId(message.id) ? message.id : null, ErrorCode.InvalidRequest, 'Invalid Request');
+    return errorResponse(
+      hasId && isValidId(message.id) ? message.id : null,
+      ErrorCode.InvalidRequest,
+      'Invalid Request',
+    );
   }
   if (!hasId) {
     // 通知。処理するものはないので応答しない
@@ -145,7 +154,11 @@ export function handleMessage(message: unknown, ctx: McpContext): JsonRpcRespons
     return errorResponse(null, ErrorCode.InvalidRequest, 'Invalid Request');
   }
   try {
-    return { jsonrpc: '2.0', id: message.id, result: dispatch(message.method, message.params, ctx) };
+    return {
+      jsonrpc: '2.0',
+      id: message.id,
+      result: dispatch(message.method, message.params, ctx),
+    };
   } catch (err) {
     if (err instanceof RpcError) return errorResponse(message.id, err.code, err.message);
     throw err;
@@ -156,7 +169,10 @@ export function handleMessage(message: unknown, ctx: McpContext): JsonRpcRespons
 export function handlePayload(payload: unknown, ctx: McpContext): McpHttpResult {
   if (Array.isArray(payload)) {
     if (payload.length === 0) {
-      return { status: 200, body: errorResponse(null, ErrorCode.InvalidRequest, 'Invalid Request: empty batch') };
+      return {
+        status: 200,
+        body: errorResponse(null, ErrorCode.InvalidRequest, 'Invalid Request: empty batch'),
+      };
     }
     const responses = payload
       .map((m) => handleMessage(m, ctx))

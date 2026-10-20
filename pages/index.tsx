@@ -14,7 +14,8 @@ export default function Home({ mcpUrl, servers, initialResponse, usage }: Props)
           <p className="live">
             <span className="nowrap">● このサイトは MCP サーバーとして稼働中</span>
             <span className="live-usage nowrap">
-              直近 30 日の呼び出し <Loaded value={usage}>{(u) => <b>{formatCount(u.total)}</b>}</Loaded>
+              直近 30 日の呼び出し{' '}
+              <Loaded value={usage}>{(u) => <b>{formatCount(u.total)}</b>}</Loaded>
             </span>
           </p>
           <h1>
@@ -57,7 +58,10 @@ export default function Home({ mcpUrl, servers, initialResponse, usage }: Props)
                   <span className="mono">{s.transport}</span>
                   <span>{s.language}</span>
                   <span className="views">
-                    参照 <Loaded value={usage}>{(u) => <b className="mono">{formatCount(u.views[s.slug] ?? 0)}</b>}</Loaded>
+                    参照{' '}
+                    <Loaded value={usage}>
+                      {(u) => <b className="mono">{formatCount(u.views[s.slug] ?? 0)}</b>}
+                    </Loaded>
                   </span>
                 </div>
               </Link>

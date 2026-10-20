@@ -7,7 +7,9 @@ import { formatCount } from '../../lib/usage';
 import type { Props } from './[slug].server';
 
 export default function ServerDetail({ server, usage }: Props) {
-  const entries = Object.entries((server.config.mcpServers ?? {}) as Record<string, Record<string, unknown>>);
+  const entries = Object.entries(
+    (server.config.mcpServers ?? {}) as Record<string, Record<string, unknown>>,
+  );
   const [name, entry] = entries[0] ?? [server.slug, {}];
 
   return (
@@ -35,7 +37,13 @@ export default function ServerDetail({ server, usage }: Props) {
         </div>
         <div>
           <dt>リポジトリ</dt>
-          <dd>{server.repo ? <a href={server.repo}>{server.repo.replace(/^https?:\/\//, '')}</a> : 'なし'}</dd>
+          <dd>
+            {server.repo ? (
+              <a href={server.repo}>{server.repo.replace(/^https?:\/\//, '')}</a>
+            ) : (
+              'なし'
+            )}
+          </dd>
         </div>
         <div>
           <dt>参照（直近 30 日）</dt>

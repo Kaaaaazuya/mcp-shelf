@@ -9,7 +9,13 @@ function Skeleton() {
   );
 }
 
-function Resolved<T>({ value, children }: { value: Promise<T>; children: (resolved: T) => ReactNode }) {
+function Resolved<T>({
+  value,
+  children,
+}: {
+  value: Promise<T>;
+  children: (resolved: T) => ReactNode;
+}) {
   return <>{children(use(value))}</>;
 }
 
@@ -33,7 +39,13 @@ class Unavailable extends Component<{ children: ReactNode }, { failed: boolean }
 }
 
 /** loader の defer() で届く値を表示する。届くまでは灰色の仮表示、失敗したら「—」 */
-export function Loaded<T>({ value, children }: { value: Promise<T>; children: (resolved: T) => ReactNode }) {
+export function Loaded<T>({
+  value,
+  children,
+}: {
+  value: Promise<T>;
+  children: (resolved: T) => ReactNode;
+}) {
   return (
     <Unavailable>
       <Suspense fallback={<Skeleton />}>

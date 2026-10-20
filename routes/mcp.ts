@@ -21,7 +21,10 @@ function methodNotAllowed() {
 export const POST = defineHandler(async (c) => {
   const servers = await loadServers(siteUrlFrom(c.req.url));
   const calls: ToolCall[] = [];
-  const result = handleBody(await c.req.text(), { servers, onToolCall: (call) => calls.push(call) });
+  const result = handleBody(await c.req.text(), {
+    servers,
+    onToolCall: (call) => calls.push(call),
+  });
   // 回数の記録に失敗しても、MCP の応答は返す
   await recordCalls(calls).catch((err) => console.error('failed to record tool calls', err));
   if (result.body === undefined) {
@@ -35,4 +38,6 @@ export const POST = defineHandler(async (c) => {
 
 export const GET = defineHandler(methodNotAllowed);
 export const DELETE = defineHandler(methodNotAllowed);
-export const OPTIONS = defineHandler(() => new Response(null, { status: 204, headers: CORS_HEADERS }));
+export const OPTIONS = defineHandler(
+  () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+);
