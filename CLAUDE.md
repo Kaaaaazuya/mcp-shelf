@@ -7,6 +7,8 @@
 - `npm run dev`: 開発サーバー（http://localhost:5173）
 - `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）
 - `npm run typecheck`: 型チェック
+- `npm run lint`: oxlint（警告も失敗扱い。設定は `.oxlintrc.json`）
+- `npm run format`: oxfmt で整形する（`npm run format:check` は確認だけ。設定は `.oxfmtrc.json`）
 - `npm run build`: 本番ビルド
 - `npx void db migrate`: ローカルの D1 に未適用のマイグレーションを流す（初回や pull の後）
 - `npx void db status`: マイグレーションの適用状況（ローカルと本番）
