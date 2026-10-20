@@ -89,7 +89,7 @@ git push origin v1.2.3
    - 同じバージョンの GitHub Release がある（デプロイ済み。タグの付け直しやワークフローの再実行もここで止まる）
    - タグのコミットが `main` に入っていない
 2. **CI と同じ確認**（`ci.yml` を呼ぶ。lint、型、テスト、ビルドなど）
-3. **デプロイ**（`npx void deploy --platform cloudflare`。GitHub の Environment `production` の Secrets を使う）
+3. **デプロイ**（GitHub Secrets のサーバーシークレットを `void secret put` で Worker に入れてから `npx void deploy --platform cloudflare`。GitHub の Environment `production` の Secrets を使う）
 4. **GitHub Release を作る**（自動生成のリリースノートつき。`v1.2.3-rc.1` のようなプレリリースは Pre-release にする）。これがデプロイ済みの印になる。
 
 デプロイが失敗したときは Release ができないので、原因を直してから同じ実行を「Re-run」すればよい。タグのコミットごと直す必要があるなら、次のバージョンのタグを切る。
@@ -98,7 +98,7 @@ git push origin v1.2.3
 
 1. 上の「初回デプロイ」を手元で済ませ、`void.lock.json` と `void.config.ts` を `main` にコミットする。CI はこの `void.lock.json` で同じ Worker と D1 を指す。
 2. Cloudflare で API トークンを作る。権限は Workers Scripts: Edit と D1: Edit。
-3. GitHub の Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN` を登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。Worker のバージョンにプレビュー URL がない場合だけ、Variables に `CLOUDFLARE_WORKERS_SUBDOMAIN`（例: `my-team`）を登録する。
+3. GitHub の Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN` を登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。Worker のサーバーシークレット（`env.ts` で宣言したもの。いまは `IP_HASH_SECRET`）も同じ Secrets に登録する。デプロイの直前に `void secret put` で Worker に入るので、本番の値を手元の `.env` に置く必要はない。値は `openssl rand -hex 32` などで作る。Worker のバージョンにプレビュー URL がない場合だけ、Variables に `CLOUDFLARE_WORKERS_SUBDOMAIN`（例: `my-team`）を登録する。
 4. 必要なら同じ画面で承認者（Required reviewers）を付ける。付けると、タグを push してもデプロイの前に承認待ちになる。
 5. タグを勝手に動かせないようにするなら、Settings → Rules → Rulesets でタグ `v*` の更新と削除を禁止する。
 
