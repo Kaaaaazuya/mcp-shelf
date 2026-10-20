@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
+  # release-deploy.yml がデプロイ前に同じ確認を走らせる
+  workflow_call:
 
 # ワークフローに渡すトークンは読み取りだけにする
 permissions:

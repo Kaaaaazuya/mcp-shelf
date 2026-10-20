@@ -23,7 +23,7 @@
 - 接続設定の JSON に書く自サイトの URL は `{{MCP_URL}}` にしておく。読み出し時にリクエストの origin から組み立てた `/mcp` の URL に置き換わる。
 - `npm test` は `db/migrations/` を Miniflare の空の D1 に流し、`lib/servers-db.ts` と同じ Drizzle の問い合わせで掲載データを読んで確かめる（`test/helpers/migrated-servers.ts`）。データ用マイグレーションの SQL の誤りもここで気づける。
 - devDependencies の `miniflare` と `drizzle-orm` は `void` が固定している版に合わせる。ずれると workerd がもう 1 つ入る。`void` を上げたら `npm ls miniflare drizzle-orm` で確かめてそろえる。
-- 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。
+- 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。手順と確認方法は `docs/deploy.md`。`v1.2.3` のような semver のタグを push すると `.github/workflows/release-deploy.yml` が自動でデプロイする（同じバージョンのタグや Release が既にあればエラー）。
 
 ## 呼び出し回数
 

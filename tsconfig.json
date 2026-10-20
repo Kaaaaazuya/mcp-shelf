@@ -11,5 +11,5 @@
     "verbatimModuleSyntax": true,
     "types": ["vite/client"]
   },
-  "include": ["db", "lib", "routes", "pages", "components", "test", "e2e", "*.ts"]
+  "include": ["db", "lib", "routes", "pages", "components", "scripts", "test", "e2e", "*.ts"]
 }

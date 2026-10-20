@@ -1,0 +1,90 @@
+name: Release deploy
+
+# v1.2.3 のようなタグを push したら本番（Cloudflare）にデプロイする。
+# 手順と事前準備は docs/deploy.md の「リリースタグで自動デプロイ」。
+on:
+  push:
+    # semver でないタグもここで受けて、検証で失敗させる
+    tags: ['**']
+
+# デプロイは 1 本ずつ。途中で止めると Worker と D1 の状態が半端になるので取り消さない
+concurrency:
+  group: release-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      prerelease: ${{ steps.tag.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # 既存タグと main の履歴を読むため全部取る
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: タグ名と重複を確かめる
+        id: tag
+        run: node scripts/check-release-tag.ts "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+      - name: タグが main に入ったコミットを指しているか確かめる
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::タグ $GITHUB_REF_NAME のコミットが main に含まれていない"
+            exit 1
+          fi
+
+  check:
+    needs: verify
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: [verify, check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Settings → Environments の production に Secrets を置く（承認者を付けることもできる）
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # トークンが複数のアカウントに触れるときだけ要る
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Worker のバージョンにプレビュー URL がないときだけ要る
+          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
+        run: npx void deploy --platform cloudflare
+
+  # Release をデプロイ済みの印にする。同じバージョンを再びデプロイしようとすると verify で止まる
+  release:
+    needs: [verify, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: GitHub Release を作る
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PRERELEASE: ${{ needs.verify.outputs.prerelease }}
+        run: |
+          flags=(--verify-tag --generate-notes --title "$GITHUB_REF_NAME")
+          if [ "$PRERELEASE" = true ]; then flags+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" "${flags[@]}"
