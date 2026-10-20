@@ -6,7 +6,7 @@
 
 - `npm run dev`: 開発サーバー（http://localhost:5173）。Void のプラグインが `@cloudflare/vite-plugin` 経由で Miniflare（workerd）を立て、ローカルの D1 に未適用のマイグレーションを流してから Worker を動かす。データは `.wrangler/` に残る
 - `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）。掲載データは Miniflare の D1 から読む
-- `npm run test:e2e`: e2e（Playwright。`e2e/`）。先に `npm run build` が要り、ブラウザが無ければ `npx playwright install chromium`。`vite preview` を立てる前にローカル D1 へマイグレーションを流し、HTTP（`/mcp`）と画面（一覧・詳細・呼び出し回数）を確かめる。呼び出し回数は D1 に残るので、増えたかどうかで見ている。ブラウザの版が合わない環境では `PLAYWRIGHT_CHROMIUM_EXECUTABLE` に Chromium のパスを渡す
+- `npm run test:e2e`: e2e（Playwright。`e2e/`）。先に `npm run build` が要り、ブラウザが無ければ `npx playwright install chromium`。`vite preview` を立てる前にローカル D1 へマイグレーションを流し、HTTP（`/mcp`）と画面（一覧・詳細・呼び出し回数）を確かめる。呼び出し回数は D1 に残るので、増えたかどうかで見ている。ブラウザの版が合わない環境では `PLAYWRIGHT_CHROMIUM_EXECUTABLE` に Chromium のパスを渡す`.env`（またはシェル）に `IP_HASH_SECRET` が要る（CI はダミーの値を渡している）
 - `npm run typecheck`: 型チェック
 - `npm run lint`: oxlint（警告も失敗扱い。設定は `.oxlintrc.json`）
 - `npm run format`: oxfmt で整形する（`npm run format:check` は確認だけ。設定は `.oxfmtrc.json`）
