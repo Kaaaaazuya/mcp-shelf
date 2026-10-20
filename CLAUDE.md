@@ -21,7 +21,7 @@
 - **列を変える**: `db/schema.ts` を直して `npx void db generate` でマイグレーションを作る。
 - 接続設定の JSON に書く自サイトの URL は `{{MCP_URL}}` にしておく。読み出し時にリクエストの origin から組み立てた `/mcp` の URL に置き換わる。
 - `npm test` は `db/migrations/` をメモリ上の SQLite に流して掲載データを確かめるので、データ用マイグレーションの SQL の誤りもここで気づける。
-- 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。
+- 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。手順と確認方法は `docs/deploy.md`。
 
 ## 呼び出し回数
 
