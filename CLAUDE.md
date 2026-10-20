@@ -4,8 +4,8 @@
 
 ## コマンド
 
-- `npm run dev`: 開発サーバー（http://localhost:5173）
-- `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）
+- `npm run dev`: 開発サーバー（http://localhost:5173）。Void のプラグインが `@cloudflare/vite-plugin` 経由で Miniflare（workerd）を立て、ローカルの D1 に未適用のマイグレーションを流してから Worker を動かす。データは `.wrangler/` に残る
+- `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）。掲載データは Miniflare の D1 から読む
 - `npm run typecheck`: 型チェック
 - `npm run lint`: oxlint（警告も失敗扱い。設定は `.oxlintrc.json`）
 - `npm run format`: oxfmt で整形する（`npm run format:check` は確認だけ。設定は `.oxfmtrc.json`）
@@ -20,7 +20,8 @@
 - **掲載内容を追加・修正する**: `db/migrations/` に `<タイムスタンプ>_<内容>.sql` を手書きし（`INSERT` / `UPDATE`、文ごとに `--> statement-breakpoint` で区切る）、`meta/_journal.json` に entry を足して、直前の snapshot を `<タイムスタンプ>_snapshot.json` に複製する（`id` を新しい UUID に、`prevId` を直前の `id` にする）。手順の根拠は `node_modules/void/docs/guide/database.md` の「Hand-written migrations」。
 - **列を変える**: `db/schema.ts` を直して `npx void db generate` でマイグレーションを作る。
 - 接続設定の JSON に書く自サイトの URL は `{{MCP_URL}}` にしておく。読み出し時にリクエストの origin から組み立てた `/mcp` の URL に置き換わる。
-- `npm test` は `db/migrations/` をメモリ上の SQLite に流して掲載データを確かめるので、データ用マイグレーションの SQL の誤りもここで気づける。
+- `npm test` は `db/migrations/` を Miniflare の空の D1 に流し、`lib/servers-db.ts` と同じ Drizzle の問い合わせで掲載データを読んで確かめる（`test/helpers/migrated-servers.ts`）。データ用マイグレーションの SQL の誤りもここで気づける。
+- devDependencies の `miniflare` と `drizzle-orm` は `void` が固定している版に合わせる。ずれると workerd がもう 1 つ入る。`void` を上げたら `npm ls miniflare drizzle-orm` で確かめてそろえる。
 - 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。
 
 ## 呼び出し回数

@@ -52,12 +52,18 @@ describe('toServers', () => {
   });
 });
 
-describe('マイグレーションの掲載データ', () => {
+describe('マイグレーションの掲載データ', async () => {
+  const servers = await migratedServers('https://s.test');
+
+  it('サーバーが 1 件以上ある', () => {
+    expect(servers.length).toBeGreaterThan(0);
+  });
+
   it('どのサーバーにもツールが 1 つ以上ある', () => {
-    for (const s of migratedServers('https://s.test')) expect(s.tools.length).toBeGreaterThan(0);
+    for (const s of servers) expect(s.tools.length).toBeGreaterThan(0);
   });
 
   it('置き換え忘れの {{MCP_URL}} が残らない', () => {
-    expect(JSON.stringify(migratedServers('https://s.test'))).not.toContain(MCP_URL_PLACEHOLDER);
+    expect(JSON.stringify(servers)).not.toContain(MCP_URL_PLACEHOLDER);
   });
 });
