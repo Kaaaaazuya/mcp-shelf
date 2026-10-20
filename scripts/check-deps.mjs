@@ -3,9 +3,7 @@
 import { readFileSync } from 'node:fs';
 
 const REGISTRY = 'https://registry.npmjs.org/';
-// `npm:<名前>@<版>` の別名も、版が完全一致なら認める
-const EXACT =
-  /^(npm:(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*@)?\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/;
+const EXACT = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/;
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
