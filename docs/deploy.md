@@ -26,6 +26,8 @@ npx void deploy --platform cloudflare
 
 ## 2 回目以降
 
+ふだんは下の「リリースタグで自動デプロイ」でタグを push する。手元から出すときは次のとおり。
+
 ```sh
 git pull
 npm ci
@@ -69,14 +71,38 @@ claude mcp add --transport http portfolio <URL>/mcp
 - D1 の復元は、復元ポイント以降の書き込み（呼び出し回数を含む）を消す。悪いマイグレーションを出したときは、コードをロールバックしてから D1 を復元し、マイグレーションを直して再デプロイする。
 - 復元ポイントは無料プランで 7 日、有料プランで 30 日で消える。それより後は、打ち消すマイグレーションを新しく書く。
 
-## GitHub からの自動デプロイ（未設定）
+## リリースタグで自動デプロイ
 
-push のたびに自動でデプロイしたくなったら、初回デプロイと `void.lock.json` のコミットを済ませたあとで設定する。
+`v1.2.3` のようなタグを push すると、`.github/workflows/release-deploy.yml` が本番にデプロイする。
 
-1. 手元で `npx void init --github` を実行し、生成されたワークフローをコミットする。
+```sh
+git switch main && git pull
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+ワークフローは次の順に進み、どこかで失敗したらデプロイしない。
+
+1. **タグを確かめる**（`scripts/check-release-tag.ts`）。次のどれかに当たるとエラーにする。
+   - タグ名が `v` + [セマンティックバージョニング](https://semver.org/lang/ja/) ではない（`v1.2`、`1.2.3`、`release-1` など）
+   - 同じバージョンを指す別のタグがある（`1.2.3` と `v1.2.3`、`v1.2.3+a` と `v1.2.3+b` は同じとみなす）
+   - 同じバージョンの GitHub Release がある（デプロイ済み。タグの付け直しやワークフローの再実行もここで止まる）
+   - タグのコミットが `main` に入っていない
+2. **CI と同じ確認**（`ci.yml` を呼ぶ。lint、型、テスト、ビルドなど）
+3. **デプロイ**（`npx void deploy --platform cloudflare`。GitHub の Environment `production` の Secrets を使う）
+4. **GitHub Release を作る**（自動生成のリリースノートつき。`v1.2.3-rc.1` のようなプレリリースは Pre-release にする）。これがデプロイ済みの印になる。
+
+デプロイが失敗したときは Release ができないので、原因を直してから同じ実行を「Re-run」すればよい。タグのコミットごと直す必要があるなら、次のバージョンのタグを切る。
+
+### 事前準備（1 回だけ）
+
+1. 上の「初回デプロイ」を手元で済ませ、`void.lock.json` と `void.config.ts` を `main` にコミットする。CI はこの `void.lock.json` で同じ Worker と D1 を指す。
 2. Cloudflare で API トークンを作る。権限は Workers Scripts: Edit と D1: Edit。
-3. GitHub のリポジトリ設定で `CLOUDFLARE_API_TOKEN` を Secrets に登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。
-4. 生成されたワークフローでも、`.github/workflows/ci.yml` と同じく `.nvmrc`（Node 24）を使い、アクションをコミット SHA で固定する（[supply-chain.md](supply-chain.md)）。
+3. GitHub の Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN` を登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。Worker のバージョンにプレビュー URL がない場合だけ、Variables に `CLOUDFLARE_WORKERS_SUBDOMAIN`（例: `my-team`）を登録する。
+4. 必要なら同じ画面で承認者（Required reviewers）を付ける。付けると、タグを push してもデプロイの前に承認待ちになる。
+5. タグを勝手に動かせないようにするなら、Settings → Rules → Rulesets でタグ `v*` の更新と削除を禁止する。
+
+ワークフローのアクションは `.github/workflows/ci.yml` と同じくコミット SHA で固定し、Node は `.nvmrc`（Node 24）を使う（[supply-chain.md](supply-chain.md)）。
 
 ## 参考
 
