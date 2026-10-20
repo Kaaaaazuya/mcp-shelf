@@ -13,6 +13,8 @@ export const ErrorCode = {
   InvalidRequest: -32600,
   MethodNotFound: -32601,
   InvalidParams: -32602,
+  /** 実装定義の範囲（-32000〜-32099）。IP 単位のレート制限を超えた */
+  TooManyRequests: -32029,
 } as const;
 
 type JsonRpcId = string | number | null;

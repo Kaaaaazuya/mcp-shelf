@@ -1,6 +1,13 @@
 import { defineConfig } from 'void/config';
 
 export default defineConfig({
+  cloudflare: {
+    // POST /mcp の IP 単位のレート制限（lib/rate-limit.ts の RATE_LIMIT と同じ値にする）。
+    // namespace_id はアカウント内で一意な正の整数。同じ値のバインディングはカウンターを共有する
+    ratelimits: [
+      { name: 'MCP_RATE_LIMITER', namespace_id: '1001', simple: { limit: 20, period: 60 } },
+    ],
+  },
   head: {
     titleTemplate: '%s | mcp-portfolio',
     htmlAttrs: { lang: 'ja' },
