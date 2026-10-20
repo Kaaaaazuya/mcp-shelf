@@ -62,19 +62,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # 本番のサーバーシークレットは GitHub Secrets に置き、ここで Worker に入れる。
-      # 空なら飛ばす（env.ts で必須なら、次の void deploy が足りないと言って止まる）
-      - name: Worker のシークレットを GitHub Secrets から入れる
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          IP_HASH_SECRET: ${{ secrets.IP_HASH_SECRET }}
-        run: |
-          if [ -z "$IP_HASH_SECRET" ]; then
-            echo "::notice::IP_HASH_SECRET が登録されていないので飛ばす"
-          else
-            printf '%s' "$IP_HASH_SECRET" | npx void secret put IP_HASH_SECRET
-          fi
       - name: Deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
