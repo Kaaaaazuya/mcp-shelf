@@ -11,7 +11,8 @@ const errors = [];
 
 for (const field of ['dependencies', 'devDependencies', 'optionalDependencies']) {
   for (const [name, spec] of Object.entries(pkg[field] ?? {})) {
-    if (!EXACT.test(spec)) errors.push(`package.json ${field}.${name}: "${spec}" は完全一致の版ではない`);
+    if (!EXACT.test(spec))
+      errors.push(`package.json ${field}.${name}: "${spec}" は完全一致の版ではない`);
   }
 }
 
