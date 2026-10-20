@@ -10,7 +10,8 @@ import { siteUrlFrom } from '../lib/site';
 import type { ToolCall } from '../lib/usage';
 import { migratedServers } from './helpers/migrated-servers';
 
-const ctx = { servers: migratedServers('https://example.test') };
+// Miniflare の D1 にマイグレーションを流して読んだ掲載データ（ファイルの最初に 1 回だけ）
+const ctx = { servers: await migratedServers('https://example.test') };
 
 function call(method: string, params?: unknown, id: number | string = 1) {
   const res = handlePayload({ jsonrpc: '2.0', id, method, params }, ctx);
