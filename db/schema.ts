@@ -31,3 +31,16 @@ export const tools = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.serverSlug, t.name] })],
 );
+
+/** /mcp の tools/call を、日・ツール・slug ごとに数えた回数。slug は get_server が読んだサーバー（それ以外は ''） */
+export const callCounts = sqliteTable(
+  'call_counts',
+  {
+    /** UTC の日付（YYYY-MM-DD） */
+    day: text('day').notNull(),
+    tool: text('tool').notNull(),
+    slug: text('slug').notNull().default(''),
+    count: integer('count').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.tool, t.slug] })],
+);

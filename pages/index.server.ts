@@ -1,8 +1,9 @@
-import { defineHandler, defineHead } from 'void';
+import { defer, defineHandler, defineHead } from 'void';
 import type { InferProps } from 'void';
 import { handlePayload } from '../lib/mcp';
 import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
+import { loadUsage } from '../lib/usage-db';
 import { INITIAL_PRESET, PRESETS } from '../lib/console-presets';
 
 export type Props = InferProps<typeof loader>;
@@ -22,7 +23,8 @@ export const loader = defineHandler(async (c) => {
   // コンソールの初期表示。JS なしでも読めるようサーバーで tools/list を処理しておく
   const initialResponse =
     handlePayload(PRESETS[INITIAL_PRESET].body, { servers: all }).body ?? null;
-  return { mcpUrl: `${siteUrl}/mcp`, servers, initialResponse };
+  // 回数は少し遅れてよいので、ページを先に返して後から届ける
+  return { mcpUrl: `${siteUrl}/mcp`, servers, initialResponse, usage: defer(() => loadUsage()) };
 });
 
 export const head = defineHead(() => ({

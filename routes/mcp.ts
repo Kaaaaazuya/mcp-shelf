@@ -4,6 +4,8 @@ import { defineHandler } from 'void';
 import { handleBody } from '../lib/mcp';
 import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
+import type { ToolCall } from '../lib/usage';
+import { recordCalls } from '../lib/usage-db';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +20,13 @@ function methodNotAllowed() {
 
 export const POST = defineHandler(async (c) => {
   const servers = await loadServers(siteUrlFrom(c.req.url));
-  const result = handleBody(await c.req.text(), { servers });
+  const calls: ToolCall[] = [];
+  const result = handleBody(await c.req.text(), {
+    servers,
+    onToolCall: (call) => calls.push(call),
+  });
+  // 回数の記録に失敗しても、MCP の応答は返す
+  await recordCalls(calls).catch((err) => console.error('failed to record tool calls', err));
   if (result.body === undefined) {
     return new Response(null, { status: result.status, headers: CORS_HEADERS });
   }
