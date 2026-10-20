@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ErrorCode, LATEST_PROTOCOL_VERSION, handleBody, handlePayload, type JsonRpcResponse } from '../lib/mcp';
 import { siteUrlFrom } from '../lib/site';
+import { migratedServers } from './helpers/migrated-servers';
 
-const ctx = { siteUrl: 'https://example.test' };
+const ctx = { servers: migratedServers('https://example.test') };
 
 function call(method: string, params?: unknown, id: number | string = 1) {
   const res = handlePayload({ jsonrpc: '2.0', id, method, params }, ctx);

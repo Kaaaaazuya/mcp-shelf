@@ -1,4 +1,4 @@
-import type { Status } from '../data/servers';
+import type { Status } from './servers';
 
 export const STATUS_LABELS: Record<Status, string> = {
   active: '稼働中',

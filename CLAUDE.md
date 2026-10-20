@@ -8,6 +8,18 @@
 - `npm test`: `lib/mcp.ts` などのユニットテスト（vitest）
 - `npm run typecheck`: 型チェック
 - `npm run build`: 本番ビルド
+- `npx void db migrate`: ローカルの D1 に未適用のマイグレーションを流す（初回や pull の後）
+- `npx void db status`: マイグレーションの適用状況（ローカルと本番）
+
+## 掲載データ
+
+掲載サーバーとツール定義は D1 の `servers` / `tools` テーブルにある。テーブル定義は `db/schema.ts`、行は `db/migrations/` のデータ用マイグレーションで入れる。`void db seed` はローカルしか作り直さないので、本番にも載る内容はマイグレーションで書く。
+
+- **掲載内容を追加・修正する**: `db/migrations/` に `<タイムスタンプ>_<内容>.sql` を手書きし（`INSERT` / `UPDATE`、文ごとに `--> statement-breakpoint` で区切る）、`meta/_journal.json` に entry を足して、直前の snapshot を `<タイムスタンプ>_snapshot.json` に複製する（`id` を新しい UUID に、`prevId` を直前の `id` にする）。手順の根拠は `node_modules/void/docs/guide/database.md` の「Hand-written migrations」。
+- **列を変える**: `db/schema.ts` を直して `npx void db generate` でマイグレーションを作る。
+- 接続設定の JSON に書く自サイトの URL は `{{MCP_URL}}` にしておく。読み出し時にリクエストの origin から組み立てた `/mcp` の URL に置き換わる。
+- `npm test` は `db/migrations/` をメモリ上の SQLite に流して掲載データを確かめるので、データ用マイグレーションの SQL の誤りもここで気づける。
+- 本番への反映は `void deploy`（未適用のマイグレーションを流してから公開する）。
 
 ## 画面を変える PR には変更前後のキャプチャを載せる
 
