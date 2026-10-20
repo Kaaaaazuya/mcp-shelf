@@ -33,6 +33,16 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      # Playwright の版に対応した Chromium を取得する（ignore-scripts は npm の依存にだけ効く）
-      - run: npx playwright install --with-deps chromium
+      # ブラウザ本体は Playwright の版ごとにキャッシュする（OS のライブラリは毎回入れる）
+      - id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm run test:e2e
