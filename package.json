@@ -12,6 +12,7 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "deploy": "void deploy",
     "check:deps": "node scripts/check-deps.mjs"
   },
@@ -22,6 +23,7 @@
     "void": "1.1.12"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.0",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
