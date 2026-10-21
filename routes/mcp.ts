@@ -1,9 +1,11 @@
 // POST /mcp。Streamable HTTP のステートレス構成。GET / DELETE は 405、OPTIONS は CORS の preflight。
-// POST は IP 単位のレート制限を超えると 429（lib/rate-limit.ts）。
+// POST は IP 単位のレート制限を超えると 429。超えるたびにブロックが倍に延びる（lib/rate-limit.ts）。
 
 import { defineHandler } from 'void';
+import { env } from 'void/env';
 import { handleBody } from '../lib/mcp';
-import { allowRequest, RATE_LIMIT, tooManyRequestsBody } from '../lib/rate-limit';
+import { kvPenaltyStore } from '../lib/penalty-kv';
+import { secondsToWait, tooManyRequestsBody } from '../lib/rate-limit';
 import { loadServers } from '../lib/servers-db';
 import { siteUrlFrom } from '../lib/site';
 import type { ToolCall } from '../lib/usage';
@@ -22,15 +24,18 @@ function methodNotAllowed() {
 }
 
 export const POST = defineHandler(async (c) => {
-  // D1 を読む前に断る。断ったリクエストも Workers の 1 日の回数には数えられる
-  if (!(await allowRequest(c.env.MCP_RATE_LIMITER, c.req.header('CF-Connecting-IP') ?? null))) {
-    return new Response(JSON.stringify(tooManyRequestsBody()), {
+  // 掲載データを読む前に断る。断ったリクエストも Workers の 1 日の回数には数えられる
+  const wait = await secondsToWait({
+    limiter: c.env.MCP_RATE_LIMITER,
+    ip: c.req.header('CF-Connecting-IP') ?? null,
+    secret: env.IP_HASH_SECRET,
+    store: kvPenaltyStore(c.env.KV),
+    now: Date.now(),
+  });
+  if (wait > 0) {
+    return new Response(JSON.stringify(tooManyRequestsBody(wait)), {
       status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': String(RATE_LIMIT.period),
-        ...CORS_HEADERS,
-      },
+      headers: { 'Content-Type': 'application/json', 'Retry-After': String(wait), ...CORS_HEADERS },
     });
   }
   const servers = await loadServers(siteUrlFrom(c.req.url));

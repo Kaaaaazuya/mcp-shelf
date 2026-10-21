@@ -22,6 +22,10 @@ npx void deploy --platform cloudflare
 3. Void が D1 を作り、`db/migrations/` を流してから Worker を公開し、URL（`https://mcp-shelf.<アカウント>.workers.dev` など）を表示する。
 4. 更新された `void.lock.json`（作ったリソースの ID とマイグレーション履歴）と `void.config.ts` をコミットして main に push する。これを忘れると、別のマシンや CI からのデプロイが同じリソースを使えない。
 
+新しい Cloudflare のリソース（D1 のほか、`/mcp` のブロックの記録に使う KV など）を使うコードを入れたときも、最初の 1 回は手元から `npx void deploy` して、更新された `void.lock.json` をコミットする。CI はロックファイルを書き戻せないので、先にやらないとタグからのデプロイのたびに新しいリソースが作られる。
+
+`env.ts` で必須にしたサーバーシークレット（今は `IP_HASH_SECRET`）が Cloudflare にないと、`void deploy` は止まる。手元から出すときは、GitHub の `production` の Secrets と同じ値を先に `npx void secret put IP_HASH_SECRET` で入れる（入力はマスクされる）。タグからのデプロイでは、ワークフローが GitHub Secrets から入れ直す。
+
 初回デプロイは 1 台のマシンからだけ行う。並行して走らせると、リソースが二重に作られることがある。
 
 ## 2 回目以降
@@ -97,8 +101,8 @@ git push origin v1.2.3
 ### 事前準備（1 回だけ）
 
 1. 上の「初回デプロイ」を手元で済ませ、`void.lock.json` と `void.config.ts` を `main` にコミットする。CI はこの `void.lock.json` で同じ Worker と D1 を指す。
-2. Cloudflare で API トークンを作る。権限は Workers Scripts: Edit と D1: Edit。
-3. GitHub の Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN` を登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。Worker のバージョンにプレビュー URL がない場合だけ、Variables に `CLOUDFLARE_WORKERS_SUBDOMAIN`（例: `my-team`）を登録する。
+2. Cloudflare で API トークンを作る。権限は Workers Scripts: Edit、D1: Edit、Workers KV Storage: Edit（`/mcp` のブロックの記録に KV を使うため）。
+3. GitHub の Settings → Environments で `production` を作り、Secrets に `CLOUDFLARE_API_TOKEN` と `IP_HASH_SECRET`（`openssl rand -hex 32` の出力。[rate-limit.md](rate-limit.md)）を登録する。トークンが複数のアカウントに触れるなら `CLOUDFLARE_ACCOUNT_ID` も登録する。Worker のバージョンにプレビュー URL がない場合だけ、Variables に `CLOUDFLARE_WORKERS_SUBDOMAIN`（例: `my-team`）を登録する。
 4. 必要なら同じ画面で承認者（Required reviewers）を付ける。付けると、タグを push してもデプロイの前に承認待ちになる。
 5. タグを勝手に動かせないようにするなら、Settings → Rules → Rulesets でタグ `v*` の更新と削除を禁止する。
 

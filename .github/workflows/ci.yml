@@ -47,4 +47,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
+      # 起動する Worker が必須の環境変数を求めるので、ダミーの値を渡す（本物の IP は扱わないので秘密である必要はない）
       - run: npm run test:e2e
+        env:
+          IP_HASH_SECRET: ci-dummy
