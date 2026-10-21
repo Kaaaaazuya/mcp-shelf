@@ -6,7 +6,7 @@ import type { ToolCall } from './usage';
 export const LATEST_PROTOCOL_VERSION = '2025-06-18';
 export const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
-export const SERVER_INFO = { name: 'mcp-portfolio', version: '0.1.0' };
+export const SERVER_INFO = { name: 'mcp-shelf', version: '0.1.0' };
 
 export const ErrorCode = {
   ParseError: -32700,
@@ -119,7 +119,7 @@ function dispatch(method: string, params: unknown, ctx: McpContext): unknown {
         capabilities: { tools: { listChanged: false } },
         serverInfo: SERVER_INFO,
         instructions:
-          'Portfolio of MCP servers. Use list_servers to see them and get_server for tool definitions and connection config.',
+          'MCP Shelf: a shelf of MCP servers built by Kazuya. Use list_servers to see them and get_server for tool definitions and connection config.',
       };
     }
     case 'ping':

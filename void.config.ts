@@ -9,7 +9,7 @@ export default defineConfig({
     ],
   },
   head: {
-    titleTemplate: '%s | mcp-portfolio',
+    titleTemplate: '%s | MCP Shelf',
     htmlAttrs: { lang: 'ja' },
     meta: [
       { charset: 'utf-8' },

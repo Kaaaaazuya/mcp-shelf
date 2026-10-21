@@ -1,0 +1,2 @@
+-- サービス名を mcp-portfolio から MCP Shelf に変える。slug（portfolio）と URL はそのまま
+UPDATE `servers` SET `name` = 'MCP Shelf', `summary` = 'この棚そのもの。並んでいる MCP サーバーの一覧と詳細を、Claude から読めるようにする', `description` = 'この棚自体もリモート MCP サーバーです。Claude に URL を渡すと、棚に並んだサーバーの一覧やツール定義を読めます。Streamable HTTP のステートレス構成で、読み取り専用のツールを 2 つ提供します。', `config` = '{"mcpServers":{"mcp-shelf":{"type":"http","url":"{{MCP_URL}}"}}}' WHERE `slug` = 'portfolio';

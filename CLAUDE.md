@@ -1,6 +1,6 @@
 # mcp-shelf
 
-自作 MCP サーバーのポートフォリオサイト。サイト自体もリモート MCP サーバー（`POST /mcp`）として動く。Void 1.1.12 + Cloudflare Workers。
+自作 MCP サーバーを並べたポートフォリオサイト「MCP Shelf」。サイト自体もリモート MCP サーバー（`POST /mcp`）として動く。Void 1.1.12 + Cloudflare Workers。
 
 ## コマンド
 

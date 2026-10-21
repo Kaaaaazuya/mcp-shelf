@@ -9,7 +9,7 @@ async function totalCalls(page: import('@playwright/test').Page) {
 
 test('トップに接続 URL と掲載サーバーが並ぶ', async ({ page, baseURL }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('ポートフォリオ');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('棚に並べています');
   await expect(page.locator('#mcp-url')).toHaveValue(`${baseURL}/mcp`);
   await expect(page.locator('.server-row')).toHaveCount(2);
 });
@@ -19,7 +19,7 @@ test('一覧から詳細に進み、一覧に戻れる', async ({ page }) => {
   await page.locator('.server-row', { hasText: 'AgentGuard' }).click();
   await expect(page).toHaveURL(/\/servers\/agentguard/);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('AgentGuard');
-  await page.getByRole('link', { name: /一覧に戻る/ }).click();
+  await page.getByRole('link', { name: /棚に戻る/ }).click();
   await expect(page).toHaveURL('/');
 });
 
