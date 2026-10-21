@@ -41,6 +41,11 @@
       "name": "npm",
       "version": ">=11.10.0",
       "onFail": "error"
+    },
+    "runtime": {
+      "name": "node",
+      "version": ">=24.21.0",
+      "onFail": "error"
     }
   }
 }

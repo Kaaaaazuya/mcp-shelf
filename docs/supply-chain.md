@@ -17,7 +17,7 @@
 
 ## 普段の使い方
 
-- Node 24 系（同梱 npm 11.10 以上）を使う。`nvm use` で `.nvmrc` が効く。
+- Node 24.21.0 以上（Void の要件）と npm 11.10 以上を使う。`package.json` の `devEngines` で、どちらかが古いと `npm ci` や `npm run` が止まる。`nvm use` で `.nvmrc` が効く。
 - 依存を足すときは `npm install <pkg>@<version>`。完全一致で保存され、7 日以内の版は選ばれない。
 - インストール後に `npm run check:deps` を通す（CI でも走る）。
 
@@ -33,4 +33,4 @@ npm rebuild <pkg> --ignore-scripts=false
 ## 注意
 
 - 7 日待てない緊急の修正版を入れるときだけ、`npm install <pkg>@<version> --min-release-age=0` で一時的に外す。
-- Cloudflare の Workers Builds など別の環境で `npm ci` するなら、そこでも Node 24 系を指定する（npm 10 だと `devEngines` で止まる）。
+- Cloudflare の Workers Builds など別の環境で `npm ci` するなら、そこでも Node 24.21.0 以上を指定する（古い Node や npm 10 だと `devEngines` で止まる）。

@@ -4,7 +4,7 @@
 
 ## 必要なもの
 
-- Node 24 系（同梱 npm 11.10 以上）。`nvm use` で `.nvmrc` が効く。古い npm だと `devEngines` で `npm ci` が止まる（[supply-chain.md](supply-chain.md)）。
+- Node 24.21.0 以上（Void 1.1.12 の要件。24.3 などでは `void deploy` が `setGlobalProxyFromEnv` の SyntaxError で落ちる）と npm 11.10 以上。`nvm install 24` で 24 系の最新を入れ、Node を入れ直したら `npm install -g npm@11` もやり直す（リポジトリの外で実行する）。どちらかが古いと `devEngines` で `npm ci` が止まる（[supply-chain.md](supply-chain.md)）。
 - Cloudflare アカウント。Workers の無料プランで足りる。無料枠を超えたリクエストはエラーになるだけで、課金はされない。
 
 ## 初回デプロイ
