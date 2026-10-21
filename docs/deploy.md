@@ -22,6 +22,8 @@ npx void deploy --platform cloudflare
 3. Void が D1 を作り、`db/migrations/` を流してから Worker を公開し、URL（`https://mcp-shelf.<アカウント>.workers.dev` など）を表示する。
 4. 更新された `void.lock.json`（作ったリソースの ID とマイグレーション履歴）と `void.config.ts` をコミットして main に push する。これを忘れると、別のマシンや CI からのデプロイが同じリソースを使えない。
 
+新しい Cloudflare のリソース（D1 のほか、`/mcp` のブロックの記録に使う KV など）を使うコードを入れたときも、最初の 1 回は手元から `npx void deploy` して、更新された `void.lock.json` をコミットする。CI はロックファイルを書き戻せないので、先にやらないとタグからのデプロイのたびに新しいリソースが作られる。
+
 `env.ts` で必須にしたサーバーシークレット（今は `IP_HASH_SECRET`）が Cloudflare にないと、`void deploy` は止まる。手元から出すときは、GitHub の `production` の Secrets と同じ値を先に `npx void secret put IP_HASH_SECRET` で入れる（入力はマスクされる）。タグからのデプロイでは、ワークフローが GitHub Secrets から入れ直す。
 
 初回デプロイは 1 台のマシンからだけ行う。並行して走らせると、リソースが二重に作られることがある。
