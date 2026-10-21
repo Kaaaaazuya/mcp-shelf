@@ -175,7 +175,7 @@ main {
   letter-spacing: 0.005em;
 }
 .hero h1 span {
-  display: inline-block;
+  display: block;
 }
 .nowrap {
   white-space: nowrap;

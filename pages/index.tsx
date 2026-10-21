@@ -12,23 +12,24 @@ export default function Home({ mcpUrl, servers, initialResponse, usage }: Props)
       <section className="hero">
         <div className="hero-text">
           <p className="live">
-            <span className="nowrap">● 稼働中 · この棚も MCP サーバーです</span>
+            <span className="nowrap">● 稼働中 · このサイトも MCP サーバーです</span>
             <span className="live-usage nowrap">
               直近 30 日の呼び出し{' '}
               <Loaded value={usage}>{(u) => <b>{formatCount(u.total)}</b>}</Loaded>
             </span>
           </p>
           <h1>
-            <span>Claude につなぐ道具を、</span>
-            <span>棚に並べています。</span>
+            <span>Claude につなげる</span>
+            <span>MCP サーバーを</span>
+            <span>作っています。</span>
           </h1>
           <p className="lead">
-            Kazuya が作った MCP
-            サーバーを、ツール定義と接続設定つきで置いています。この棚自体もリモート MCP
-            サーバーなので、URL を Claude に渡せば同じ中身をそのまま読めます。
+            作った MCP
+            サーバーを、ツール定義と接続設定つきで公開しています。このサイト自体もリモート MCP
+            サーバーなので、URL を Claude に渡せば同じ内容をそのまま読めます。
           </p>
           <div id="connect" className="connect">
-            <label htmlFor="mcp-url">この棚を Claude につなぐ</label>
+            <label htmlFor="mcp-url">このサイトを Claude につなぐ</label>
             <div className="connect-row">
               <input id="mcp-url" readOnly value={mcpUrl} />
               <CopyButton text={mcpUrl} className="btn" label="URL をコピー" />
@@ -44,7 +45,7 @@ export default function Home({ mcpUrl, servers, initialResponse, usage }: Props)
       <section id="servers" className="servers" aria-labelledby="servers-title">
         <div className="section-head">
           <h2 id="servers-title">
-            棚にあるサーバー <span className="count mono">{servers.length} 台</span>
+            サーバー一覧 <span className="count mono">{servers.length} 台</span>
           </h2>
           <span>「読まれた回数」は直近 30 日に get_server で詳細を取得された回数</span>
         </div>

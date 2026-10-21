@@ -65,7 +65,7 @@ export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
     <section className="console" aria-label="MCP コンソール">
       <div className="console-head">
         <h2>その場で呼んでみる</h2>
-        <p>ボタンを押すと、この棚に本物のリクエストを送ります</p>
+        <p>ボタンを押すと、このサイトに本物のリクエストを送ります</p>
       </div>
       <div className="console-tabs" role="tablist" aria-label="送るリクエスト">
         {PRESETS.map((preset, i) => (

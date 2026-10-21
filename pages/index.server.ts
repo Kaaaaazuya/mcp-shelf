@@ -28,12 +28,12 @@ export const loader = defineHandler(async (c) => {
 });
 
 export const head = defineHead(() => ({
-  title: 'Claude につなぐ MCP サーバーの棚',
+  title: 'Claude につなげる MCP サーバー',
   meta: [
     {
       name: 'description',
       content:
-        'Kazuya が作った MCP サーバーを、ツール定義と接続設定つきで並べた棚。サイト自体もリモート MCP サーバーとして動いています。',
+        'Kazuya が作った MCP サーバーを、ツール定義と接続設定つきで公開しています。サイト自体もリモート MCP サーバーとして動いています。',
     },
   ],
 }));

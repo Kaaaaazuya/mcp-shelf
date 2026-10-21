@@ -15,7 +15,7 @@ export default function ServerDetail({ server, position, usage }: Props) {
   return (
     <main className="container detail">
       <Link href="/" className="back-link">
-        ← 棚に戻る
+        ← 一覧に戻る
       </Link>
       <p className="detail-label mono">
         {String(position + 1).padStart(2, '0')} / {server.slug}
