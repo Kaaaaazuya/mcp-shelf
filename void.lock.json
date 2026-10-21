@@ -23,7 +23,17 @@
           "period": 60
         }
       }
-    ]
+    ],
+    "account_id": "692cd8c6a8d4fc048af5e3da855b6383",
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "mcp-shelf-db",
+        "database_id": "548897f8-bc94-4434-b011-963a1c2ec555",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "name": "mcp-shelf"
   },
-  "text": "{\n  \"compatibility_date\": \"2026-02-24\",\n  \"ratelimits\": [\n    {\n      \"name\": \"MCP_RATE_LIMITER\",\n      \"namespace_id\": \"1001\",\n      \"simple\": {\n        \"limit\": 20,\n        \"period\": 60\n      }\n    }\n  ]\n}\n"
+  "text": "{\n  \"compatibility_date\": \"2026-02-24\",\n  \"ratelimits\": [\n    {\n      \"name\": \"MCP_RATE_LIMITER\",\n      \"namespace_id\": \"1001\",\n      \"simple\": {\n        \"limit\": 20,\n        \"period\": 60\n      }\n    }\n  ],\n  \"account_id\": \"692cd8c6a8d4fc048af5e3da855b6383\",\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"mcp-shelf-db\",\n      \"database_id\": \"548897f8-bc94-4434-b011-963a1c2ec555\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"name\": \"mcp-shelf\"\n}\n"
 }

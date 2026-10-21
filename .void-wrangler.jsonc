@@ -9,5 +9,15 @@
         "period": 60
       }
     }
-  ]
+  ],
+  "account_id": "692cd8c6a8d4fc048af5e3da855b6383",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mcp-shelf-db",
+      "database_id": "548897f8-bc94-4434-b011-963a1c2ec555",
+      "migrations_dir": "./db/migrations"
+    }
+  ],
+  "name": "mcp-shelf"
 }
