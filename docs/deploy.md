@@ -24,7 +24,14 @@ npx void deploy --platform cloudflare
 
 新しい Cloudflare のリソース（D1 のほか、`/mcp` のブロックの記録に使う KV など）を使うコードを入れたときも、最初の 1 回は手元から `npx void deploy` して、更新された `void.lock.json` をコミットする。CI はロックファイルを書き戻せないので、先にやらないとタグからのデプロイのたびに新しいリソースが作られる。
 
-`env.ts` で必須にしたサーバーシークレット（今は `IP_HASH_SECRET`）が Cloudflare にないと、`void deploy` は止まる。手元から出すときは、GitHub の `production` の Secrets と同じ値を先に `npx void secret put IP_HASH_SECRET` で入れる（入力はマスクされる）。タグからのデプロイでは、ワークフローが GitHub Secrets から入れ直す。
+`env.ts` で必須にしたサーバーシークレット（今は `IP_HASH_SECRET`）が Cloudflare にないと、`void deploy` は止まる。手元から出すときは、GitHub の `production` の Secrets と同じ値を先に Worker に入れる。`void secret put` は、この checkout のデプロイ先が Cloudflare だと保存されているときだけ Cloudflare に入れる（ないと「Not logged in」で止まる）。`.void/` は Git に入らないので、checkout ごとに 1 回、次を実行する。
+
+```sh
+mkdir -p .void && printf '{\n  "platform": "cloudflare"\n}\n' > .void/project.json
+npx void secret put IP_HASH_SECRET   # 値の入力はマスクされる
+```
+
+タグからのデプロイでは、ワークフローが同じことをして GitHub Secrets から入れ直す。
 
 初回デプロイは 1 台のマシンからだけ行う。並行して走らせると、リソースが二重に作られることがある。
 
@@ -35,10 +42,10 @@ npx void deploy --platform cloudflare
 ```sh
 git pull
 npm ci
-npx void deploy
+npx void deploy --platform cloudflare
 ```
 
-選んだアカウントは保存されるので、`--platform cloudflare` は要らない。毎回、未適用のマイグレーションを本番の D1 に流してから公開する。
+アカウントは `void.lock.json` に入っている。`--platform cloudflare` は毎回付ける（上の `.void/project.json` を作ってあれば省ける）。付けずに、保存されたデプロイ先もない checkout で実行すると、「Link this project and deploy to Cloudflare using the existing Worker and resources?」と聞かれ、`Yes` を選ぶと下の「リンクのエラー」で止まる。毎回、未適用のマイグレーションを本番の D1 に流してから公開する。
 
 - **掲載内容を変えた**とき: `db/migrations/` に追加したデータ用マイグレーションが、このデプロイで本番に入る（書き方は [CLAUDE.md](../CLAUDE.md) の「掲載データ」）。
 - マイグレーションを流す前に、D1 の復元ポイントが自動で作られ、戻すための `void db restore` コマンドが表示される。
@@ -107,6 +114,15 @@ git push origin v1.2.3
 5. タグを勝手に動かせないようにするなら、Settings → Rules → Rulesets でタグ `v*` の更新と削除を禁止する。
 
 ワークフローのアクションは `.github/workflows/ci.yml` と同じくコミット SHA で固定し、Node は `.nvmrc`（Node 24）を使う（[supply-chain.md](supply-chain.md)）。
+
+## リンクのエラー
+
+`Link the existing site without adding runtime features, auth setup, or database migrations. Make those changes in a later deployment.` で止まるのは、Void が「既存の Worker に紐づけるだけ」のモードに入ったとき。このモードはマイグレーションがあるプロジェクトを受け付けない。入る条件は次のどちらか。
+
+- デプロイ先が未保存の checkout で `npx void deploy`（`--platform` なし）を実行し、上の質問に `Yes` と答えた。
+- 前に途中で止まったリンクの跡 `.void/cloudflare-link.json` が残っている。
+
+直し方: `rm -f .void/cloudflare-link.json` で跡を消し、`npx void deploy --platform cloudflare` で実行する（聞かれなければ、リンクのモードには入らない）。
 
 ## 参考
 
