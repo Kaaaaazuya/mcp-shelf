@@ -64,8 +64,8 @@ export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
   return (
     <section className="console" aria-label="MCP コンソール">
       <div className="console-head">
-        <span className="mono">POST /mcp</span>
-        <p>ボタンを押すと、このサイトに実際にリクエストを送ります</p>
+        <h2>その場で呼んでみる</h2>
+        <p>ボタンを押すと、このサイトに本物のリクエストを送ります</p>
       </div>
       <div className="console-tabs" role="tablist" aria-label="送るリクエスト">
         {PRESETS.map((preset, i) => (
@@ -81,13 +81,13 @@ export function McpConsole({ initialResponse }: { initialResponse: unknown }) {
         ))}
       </div>
       <div className="console-pane">
-        <div className="console-pane-head">リクエスト</div>
+        <div className="console-pane-head mono">→ POST /mcp</div>
         <pre className="codeblock">{JSON.stringify(PRESETS[active].body, null, 2)}</pre>
       </div>
       <div className="console-pane">
         <div className="console-pane-head">
-          <span>
-            {result.expanded ? 'レスポンス（content[0].text を展開して表示）' : 'レスポンス'}
+          <span className="mono">
+            {result.expanded ? '← レスポンス（content[0].text を展開）' : '← レスポンス'}
           </span>
           <span
             className={result.ok ? 'console-status' : 'console-status is-error'}

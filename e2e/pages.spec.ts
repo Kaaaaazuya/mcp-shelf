@@ -9,7 +9,7 @@ async function totalCalls(page: import('@playwright/test').Page) {
 
 test('トップに接続 URL と掲載サーバーが並ぶ', async ({ page, baseURL }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('ポートフォリオ');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('その場で試せます');
   await expect(page.locator('#mcp-url')).toHaveValue(`${baseURL}/mcp`);
   await expect(page.locator('.server-row')).toHaveCount(2);
 });

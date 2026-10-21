@@ -10,12 +10,15 @@ export type Props = InferProps<typeof loader>;
 
 export const loader = defineHandler(async (c) => {
   const servers = await loadServers(siteUrlFrom(c.req.url));
-  const server = servers.find((s) => s.slug === c.req.param('slug'));
+  const position = servers.findIndex((s) => s.slug === c.req.param('slug'));
+  const server = servers[position];
   if (!server) {
     throw new HTTPException(404, { message: 'Server not found' });
   }
   return {
     server,
+    // 一覧と同じ「01 / slug」の番号を出すための並び順
+    position,
     usage: defer(async () => {
       const usage = await loadUsage();
       return {

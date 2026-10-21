@@ -82,7 +82,7 @@ describe('tools', () => {
     const list = JSON.parse(text);
     expect(list[0]).toEqual({
       slug: 'portfolio',
-      name: 'mcp-portfolio',
+      name: 'MCP Shelf',
       summary: expect.any(String),
       transport: 'streamable-http',
       status: 'active',
@@ -101,7 +101,7 @@ describe('tools', () => {
     const { text } = toolText(
       call('tools/call', { name: 'get_server', arguments: { slug: 'portfolio' } }),
     );
-    expect(JSON.parse(text).config.mcpServers.portfolio.url).toBe('https://example.test/mcp');
+    expect(JSON.parse(text).config.mcpServers['mcp-shelf'].url).toBe('https://example.test/mcp');
   });
 
   it('get_server の未知 slug は isError: true と案内文', () => {
