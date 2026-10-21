@@ -19,14 +19,13 @@ export default function Home({ mcpUrl, servers, initialResponse, usage }: Props)
             </span>
           </p>
           <h1>
-            <span>Claude につなげる</span>
-            <span>MCP サーバーを</span>
-            <span>作っています。</span>
+            <span>作った MCP サーバーを、</span>
+            <span>その場で試せます。</span>
           </h1>
           <p className="lead">
-            作った MCP
-            サーバーを、ツール定義と接続設定つきで公開しています。このサイト自体もリモート MCP
-            サーバーなので、URL を Claude に渡せば同じ内容をそのまま読めます。
+            Kazuya が作った MCP
+            サーバーを、ツール定義と接続設定つきで公開しています。コンソールから実際に呼べるうえ、このサイト自体もリモート
+            MCP サーバーなので、URL を Claude に渡せば同じ内容をそのまま読めます。
           </p>
           <div id="connect" className="connect">
             <label htmlFor="mcp-url">このサイトを Claude につなぐ</label>

@@ -28,7 +28,7 @@ export const loader = defineHandler(async (c) => {
 });
 
 export const head = defineHead(() => ({
-  title: 'Claude につなげる MCP サーバー',
+  title: '作った MCP サーバーを、その場で試せます',
   meta: [
     {
       name: 'description',
