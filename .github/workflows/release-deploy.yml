@@ -73,6 +73,11 @@ jobs:
           if [ -z "$IP_HASH_SECRET" ]; then
             echo "::warning::IP_HASH_SECRET が production の Secrets にないので飛ばす"
           else
+            # void secret put は、保存済みのデプロイ先（.void/project.json）が cloudflare のときだけ
+            # Cloudflare の Worker に入れる。ないと Void のプラットフォームを探して「Not logged in」で落ちる。
+            # .void は Git に入らないので、CI では毎回ここで作る
+            mkdir -p .void
+            printf '{\n  "platform": "cloudflare"\n}\n' > .void/project.json
             printf '%s' "$IP_HASH_SECRET" | npx void secret put IP_HASH_SECRET
           fi
       - name: Deploy
