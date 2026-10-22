@@ -17,10 +17,10 @@
     "check:deps": "node scripts/check-deps.mjs"
   },
   "dependencies": {
-    "@void/react": "1.1.12",
+    "@void/react": "1.2.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "void": "1.1.12"
+    "void": "1.2.0"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
@@ -29,7 +29,7 @@
     "@types/react-dom": "19.3.0",
     "drizzle-orm": "0.45.4",
     "hono": "4.13.13",
-    "miniflare": "5.20261012.0-beta",
+    "miniflare": "5.20261012.1-beta",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
     "typescript": "7.0.2",
